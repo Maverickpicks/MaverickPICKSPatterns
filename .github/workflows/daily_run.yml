@@ -125,7 +125,7 @@ jobs:
           python pattern_detector_v2.py \
             --csv_file NIFTY500_MASTER.csv \
             --lookback 90 \
-            --min_score 50 \
+            --min_score 40 \
             --workers 4 \
             --out_csv todays_picks.csv
 
