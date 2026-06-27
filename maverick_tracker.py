@@ -150,26 +150,49 @@ def import_picks(wl: dict) -> tuple:
             skipped += 1
             continue
 
+        # Support both old column names (patterns_today.csv) and new (scan_results.csv)
+        def _f(row, *keys, default=0.0):
+            for k in keys:
+                v = row.get(k)
+                if v is not None and str(v).strip() not in ("","nan","None"):
+                    try: return float(v)
+                    except: pass
+            return default
+
+        def _s(row, *keys, default=""):
+            for k in keys:
+                v = row.get(k)
+                if v is not None and str(v).strip() not in ("","nan","None"):
+                    return str(v)
+            return default
+
+        def _b(row, *keys):
+            for k in keys:
+                v = row.get(k)
+                if v is not None:
+                    return str(v).lower() in ("true","1","yes")
+            return False
+
         wl["picks"][key] = {
-            "symbol":       sym,
-            "pattern":      pattern,
-            "state":        WATCHING,
-            "date_added":   scan_date,
-            "score":        float(row.get("Score") or 0),
-            "confidence":   str(row.get("Confidence","")),
-            "entry":        float(row.get("Entry_Breakout") or 0),
-            "stop_loss":    float(row.get("Stop_Loss") or 0),
-            "target":       float(row.get("Target") or 0),
-            "risk_reward":  float(row.get("Risk_Reward") or 0),
-            "gap_pct":      float(row.get("Gap_To_Entry_%") or 0),
-            "pattern_start":str(row.get("Pattern_Start","")),
-            "pattern_expiry":str(row.get("Pattern_Expiry","")),
+            "symbol":        sym,
+            "pattern":       pattern,
+            "state":         WATCHING,
+            "date_added":    scan_date,
+            "score":         _f(row, "Score"),
+            "confidence":    _s(row, "Confidence"),
+            "entry":         _f(row, "Entry_Breakout", "Breakout_Level"),
+            "stop_loss":     _f(row, "Stop_Loss"),
+            "target":        _f(row, "Target", "Target_1"),
+            "risk_reward":   _f(row, "Risk_Reward"),
+            "gap_pct":       _f(row, "Gap_To_Entry_%", "Gap_To_Break_%"),
+            "pattern_start": _s(row, "Pattern_Start"),
+            "pattern_expiry":_s(row, "Pattern_Expiry"),
             "days_to_expiry":row.get("Days_To_Expiry"),
-            "pole_return":  float(row.get("Pole_Return_%") or 0),
-            "vol_all3":     bool(row.get("Vol_All3_OK", False)),
-            "breakout_vol": float(row.get("Breakout_Vol_Watch") or 0),
-            "weekly_trend": str(row.get("Weekly_Trend","")),
-            "narrative":    str(row.get("Narrative","")),
+            "pole_return":   _f(row, "Pole_Return_%"),
+            "vol_all3":      _b(row, "Vol_All3_OK", "Vol_All_3_OK"),
+            "breakout_vol":  _f(row, "Breakout_Vol_Watch"),
+            "weekly_trend":  _s(row, "Weekly_Trend", "Weekly_Confirmed"),
+            "narrative":     _s(row, "Narrative"),
             "price_history":[],
             "track_signal": "NEUTRAL",
             "track_detail": "",
@@ -451,8 +474,12 @@ def generate_picks_dashboard():
           <td style="padding:12px 10px;font-size:11px;color:{exp_col};vertical-align:top">{exp}</td>
           <td style="padding:12px 10px;font-size:11px;color:#475569;vertical-align:top">
             {r.get("Pattern_Start","")}</td>
-          <td style="padding:12px 10px;vertical-align:top">
-            <div style="max-width:500px">{narr_html}</div>
+          <td style="padding:12px 10px;vertical-align:top;max-width:400px">
+            <details>
+              <summary style="cursor:pointer;font-size:11px;color:#1d4ed8;font-weight:600">
+                View narrative ▼</summary>
+              <div style="margin-top:6px">{narr_html}</div>
+            </details>
           </td>
         </tr>"""
 
