@@ -3,8 +3,7 @@
 #
 # Schedule (IST = UTC+5:30):
 #   Mon & Wed 6:00 AM IST (00:30 UTC) -> main_v3 scan
-#   Daily     3:45 PM IST (10:15 UTC) -> pattern + H&S scan
-#   Daily     4:15 PM IST (10:45 UTC) -> unified tracker + dashboards
+#   Daily     3:45 PM IST (10:15 UTC) -> pattern + H&S scan + tracker (sequential)
 #
 # Dashboards:
 #   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_maverick.html
@@ -18,32 +17,30 @@ permissions:
 
 on:
   schedule:
-    - cron: '30 0 * * 1,3'
-    - cron: '15 10 * * 1-5'
-    - cron: '45 10 * * 1-5'
+    - cron: '30 0 * * 1,3'    # main_v3: Mon & Wed 6:00 AM IST
+    - cron: '15 10 * * 1-5'   # pattern + tracker: daily 3:45 PM IST
 
   workflow_dispatch:
     inputs:
       run_mode:
         description: 'Which job to run?'
         required: true
-        default: 'tracker_only'
+        default: 'pattern_and_track'
         type: choice
         options:
-          - tracker_only
-          - pattern_scan
+          - pattern_and_track
           - main_v3_scan
-          - all
+          - tracker_only
 
 jobs:
 
+  # ── JOB 1: main_v3 scan — Mon & Wed 6:00 AM IST ────────────────────────────
   main_v3_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     if: >
       (github.event_name == 'workflow_dispatch' &&
-       (github.event.inputs.run_mode == 'main_v3_scan' ||
-        github.event.inputs.run_mode == 'all')) ||
+       github.event.inputs.run_mode == 'main_v3_scan') ||
       (github.event_name == 'schedule' &&
        github.event.schedule == '30 0 * * 1,3')
 
@@ -73,8 +70,9 @@ jobs:
           git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add MaverickPICKS_Top10_Report.xlsx unified_watchlist.json \
+          git add -f MaverickPICKS_Top10_Report.xlsx unified_watchlist.json \
                   dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
+          echo "Files staged:"; git diff --staged --name-only
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -90,13 +88,16 @@ jobs:
           retention-days: 30
 
 
-  pattern_scan:
+  # ── JOB 2: Pattern scan + Tracker — runs as ONE sequential job ─────────────
+  # Everything in one job so files persist between steps naturally.
+  # No cross-job file transfer needed.
+  pattern_and_track:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     if: >
       (github.event_name == 'workflow_dispatch' &&
-       (github.event.inputs.run_mode == 'pattern_scan' ||
-        github.event.inputs.run_mode == 'all')) ||
+       (github.event.inputs.run_mode == 'pattern_and_track' ||
+        github.event.inputs.run_mode == 'tracker_only')) ||
       (github.event_name == 'schedule' &&
        github.event.schedule == '15 10 * * 1-5')
 
@@ -120,7 +121,9 @@ jobs:
           print('Day:', now.strftime('%A'))
           "
 
+      # ── STEP 1: Run Murphy pattern scanner ──────────────────────────────────
       - name: Run Murphy pattern scanner
+        if: github.event.inputs.run_mode != 'tracker_only'
         run: |
           python pattern_detector_v2.py \
             --csv_file NIFTY500_MASTER.csv \
@@ -128,93 +131,65 @@ jobs:
             --min_score 40 \
             --workers 4 \
             --out_csv todays_picks.csv
+          echo "Scanner done. todays_picks.csv exists: $(test -f todays_picks.csv && echo YES || echo NO)"
+          test -f todays_picks.csv && wc -l todays_picks.csv || echo "File missing"
 
+      # ── STEP 2: Run H&S scanner ─────────────────────────────────────────────
       - name: Run H&S scanner
-        run: python hs_runner.py --min_quality 40 --workers 3 || echo "H&S scan skipped"
-
-      - name: Import picks into unified tracker
+        if: github.event.inputs.run_mode != 'tracker_only'
         run: |
-          CMD="python unified_tracker.py --import_patterns todays_picks.csv"
-          if [ -f hs_watchlist.csv ]; then
-            CMD="$CMD --import_hs hs_watchlist.csv"
-          fi
+          python hs_runner.py --min_quality 40 --workers 3 || echo "H&S scan skipped"
+          echo "hs_watchlist.csv exists: $(test -f hs_watchlist.csv && echo YES || echo NO)"
+
+      # ── STEP 3: Import new picks into unified tracker ───────────────────────
+      - name: Import picks into unified tracker
+        if: github.event.inputs.run_mode != 'tracker_only'
+        run: |
+          CMD="python unified_tracker.py"
+          test -f todays_picks.csv && CMD="$CMD --import_patterns todays_picks.csv"
+          test -f hs_watchlist.csv && CMD="$CMD --import_hs hs_watchlist.csv"
+          echo "Running: $CMD"
           eval $CMD
 
-      - name: Commit results
-        run: |
-          git config user.name  "MaverickPICKS Bot"
-          git config user.email "maverick@noreply.github.com"
-          git pull --rebase origin main 2>/dev/null || true
-          git add todays_picks.csv unified_watchlist.json \
-                  dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
-          git add hs_watchlist.csv 2>/dev/null || true
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Pattern scan -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
-            git push
-          fi
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: patterns-${{ github.run_number }}
-          path: |
-            todays_picks.csv
-            hs_watchlist.csv
-            unified_watchlist.json
-          retention-days: 30
-
-
-  tracker_check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    if: >
-      (github.event_name == 'workflow_dispatch' &&
-       (github.event.inputs.run_mode == 'tracker_only' ||
-        github.event.inputs.run_mode == 'all')) ||
-      (github.event_name == 'schedule' &&
-       github.event.schedule == '45 10 * * 1-5')
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run unified tracker
+      # ── STEP 4: Check all watching picks (fetch prices + track signals) ─────
+      - name: Check all watching picks
         run: python unified_tracker.py --check
 
+      # ── STEP 5: Run performance logger ──────────────────────────────────────
       - name: Run performance logger
         run: python performance_logger.py
 
+      # ── STEP 6: Print daily summary ─────────────────────────────────────────
       - name: Print daily summary
         run: python summary.py
 
-      - name: Commit dashboards
+      # ── STEP 7: Commit everything ────────────────────────────────────────────
+      - name: Commit all results
         run: |
           git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
+          git add -f todays_picks.csv hs_watchlist.csv 2>/dev/null || true
           git add unified_watchlist.json performance_history.json \
                   dashboard_maverick.html dashboard_patterns.html \
                   dashboard_performance.html 2>/dev/null || true
+          echo "Files staged for commit:"
+          git diff --staged --name-only
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "Nothing changed — no commit needed"
           else
-            git commit -m "Tracker -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git commit -m "Daily run -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
             git push
+            echo "Committed and pushed successfully"
           fi
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: tracker-${{ github.run_number }}
+          name: daily-output-${{ github.run_number }}
           path: |
+            todays_picks.csv
+            hs_watchlist.csv
             unified_watchlist.json
             dashboard_maverick.html
             dashboard_patterns.html
