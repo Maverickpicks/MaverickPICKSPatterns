@@ -1692,8 +1692,20 @@ def main():
     print_report(results_by_symbol, use_weekly)
 
     # ── Save CSV ──────────────────────────────────────────────────────────────
-    if args.out_csv and summary_rows:
-        out_df = pd.DataFrame(summary_rows).sort_values("Score", ascending=False)
+    if args.out_csv:
+        if summary_rows:
+            out_df = pd.DataFrame(summary_rows).sort_values("Score", ascending=False)
+        else:
+            # Always write CSV even when empty so the tracker import step
+            # doesn't fail with "file not found"
+            out_df = pd.DataFrame(columns=[
+                "Symbol","Pattern","Detected","In_Formation","Score","Confidence",
+                "Breakout_Level","Stop_Loss","Target_1","Risk_Reward","Gap_To_B_%",
+                "Pole_Return_%","Pole_Bars","Consol_Bars","Vol_Pole_Surge",
+                "Vol_Consol_Avg_OK","Vol_Trend_Decline","Vol_All_3_OK",
+                "Breakout_Vol_Watch","Weekly_Confirmed","Notes","Narrative",
+            ])
+            print("  No patterns detected above threshold — try lowering --min_score.\n")
         out_df.to_csv(args.out_csv, index=False)
         print(f"  Results saved → {args.out_csv}  ({len(out_df)} rows)\n")
     elif not summary_rows:
