@@ -463,11 +463,11 @@ def generate_picks_dashboard():
           <td style="padding:12px 10px;vertical-align:top;font-weight:600;color:{_conf_color(str(r.get('Confidence','')))}">
             {r.get("Confidence","")}</td>
           <td style="padding:12px 10px;text-align:right;font-weight:600;color:#1d4ed8;vertical-align:top">
-            ₹{r.get("Entry_Breakout",0):,.2f}</td>
+            ₹{(r.get("Entry_Breakout") or r.get("Breakout_Level") or 0):,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#dc2626;vertical-align:top">
-            ₹{r.get("Stop_Loss",0):,.2f}</td>
+            ₹{(r.get("Stop_Loss") or 0):,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">
-            ₹{r.get("Target",0):,.2f}</td>
+            ₹{(r.get("Target") or r.get("Target_1") or 0):,.2f}</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">{r.get("Risk_Reward",0):.1f}x</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">
             {'✓' if vol_ok else '✗'}</td>
