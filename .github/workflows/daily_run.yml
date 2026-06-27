@@ -13,7 +13,7 @@ on:
       run_mode:
         description: 'Which job to run?'
         required: true
-        default: 'pattern_and_track'
+        default: 'tracker_only'
         type: choice
         options:
           - pattern_and_track
