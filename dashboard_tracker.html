@@ -1,0 +1,990 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><title>MaverickPICKS Tracker</title><style>
+* { box-sizing:border-box; margin:0; padding:0 }
+body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+       background:#f1f5f9; color:#1e293b }
+.hdr { background:linear-gradient(135deg,#0f172a,#7c3aed);color:#fff;padding:20px 28px }
+.hdr h1 { font-size:20px;font-weight:700 }
+.hdr p  { font-size:12px;opacity:.75;margin-top:3px }
+.stats { display:flex;gap:12px;padding:16px 28px;flex-wrap:wrap }
+.stat { background:#fff;border:1px solid #e2e8f0;border-radius:10px;
+        padding:12px 18px;min-width:110px }
+.stat .n { font-size:24px;font-weight:700 }
+.stat .l { font-size:11px;color:#64748b;margin-top:2px }
+.section { padding:0 28px 24px }
+.sec-title { font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;
+             letter-spacing:.05em;margin:16px 0 8px;border-left:3px solid #3b82f6;
+             padding-left:10px }
+table { width:100%;border-collapse:collapse;background:#fff;border-radius:10px;
+        overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.06);font-size:12px }
+thead tr { background:#0f172a;color:#fff }
+thead th { padding:9px 10px;font-size:11px;font-weight:600;text-transform:uppercase;
+           letter-spacing:.04em;white-space:nowrap;text-align:left }
+tbody tr { border-bottom:1px solid #f1f5f9 }
+tbody tr:hover { background:#f8fafc }
+.note { font-size:11px;color:#64748b;padding:8px 28px 20px }
+</style></head><body>
+<div class="hdr">
+  <h1>MaverickPICKS — Active Pick Tracker</h1>
+  <p>Updated: 27-Jun-2026 18:45 IST &nbsp;|&nbsp; 56 watching &nbsp;|&nbsp;
+     0 breakouts &nbsp;|&nbsp; 0 breakdowns</p>
+</div>
+<div class="stats">
+  <div class="stat"><div class="n">56</div><div class="l">👁 Watching</div></div>
+  <div class="stat"><div class="n" style="color:#166534">0</div><div class="l">🟢 Breakouts</div></div>
+  <div class="stat"><div class="n" style="color:#991b1b">0</div><div class="l">🔴 Breakdowns</div></div>
+  <div class="stat"><div class="n" style="color:#1d4ed8">22.2%</div><div class="l">Hit Rate</div></div>
+  <div class="stat"><div class="n" style="color:#166534">+3.1%</div><div class="l">Avg P&L</div></div>
+  <div class="stat"><div class="n">9</div><div class="l">Resolved</div></div>
+</div>
+<div class="section">
+  <div class="sec-title">👁 Watching — sorted by proximity to entry</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th>Symbol</th><th>Pattern</th><th>Track Signal</th><th>Signal Detail</th>
+      <th>ETA</th><th>Last Close</th><th>Gap to Entry</th>
+      <th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
+      <th>Days</th><th>Expiry</th><th>Trend</th>
+    </tr></thead>
+    <tbody><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CONCORDBIO</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,273.60</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">OLAELEC</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹41.05</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ARE&M</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹793.85</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">AIIL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹515.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">IFCI</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹76.55</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.2x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">UBL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,322.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">DOMS</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹2,245.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">AEGISVOPAK</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹229.22</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ABDL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹610.15</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.7x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">EMMVEE</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹323.70</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">MCX</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹2,761.80</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">VIJAYA</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,252.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.2x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">PFC</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹431.70</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CENTRALBK</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹32.12</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.7x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ATHERENERG</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹950.35</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.8x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">BANKBARODA</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹274.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">PNB</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹107.54</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">5.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CHAMBLFERT</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹466.10</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CRAFTSMAN</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹9,226.50</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.5x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">BRIGADE</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹518.80</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.5x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">J&KBANK</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹157.60</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.6x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">GODREJCP</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,020.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.4x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ELGIEQUIP</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹600.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">4.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">AFCONS</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹311.10</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">GMRAIRPORT</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹106.37</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">IFCI</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Pennant</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹70.01</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">0.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CARTRADE</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Pennant</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹2,384.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.2x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">INDIACEM</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹373.60</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">DIXON</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹11,716.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">0.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">PVRINOX</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹938.25</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">EMMVEE</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Pennant</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹320.05</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.8x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">JUBLFOOD</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹416.05</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.4x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ANANTRAJ</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹516.90</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">BALRAMCHIN</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹531.10</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">GODREJIND</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,044.10</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.2x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">HSCL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹630.05</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.5x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ELGIEQUIP</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹594.80</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.1x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">DIVISLAB</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹6,571.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.6x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CUB</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹194.55</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.7x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">COROMANDEL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,966.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.4x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">SUZLON</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹56.87</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">LATENTVIEW</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹282.65</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.4x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">JUBLPHARMA</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹948.10</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">HYUNDAI</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,863.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.2x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">FACT</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹868.00</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.6x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">EXIDEIND</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹380.35</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.4x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">BEML</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,742.20</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">ABDL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Pennant</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹608.85</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.9x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">TRAVELFOOD</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Pennant</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,304.40</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.5x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CGCL</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹214.35</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">3.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">CANBK</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Ascending Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹128.01</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.5x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">FIVESTAR</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹488.20</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">2.0x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">NLCINDIA</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹307.85</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.8x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">BALRAMCHIN</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹527.70</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.8x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">GRAVITA</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Bull Flag</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹1,666.90</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.7x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr><tr>
+          <td style="padding:10px;font-weight:700;font-size:13px">INTELLECT</td>
+          <td style="padding:10px;font-size:11px;color:#475569">Symmetrical Triangle</td>
+          <td style="padding:10px"><span style="background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">⚪ NEUTRAL</span></td>
+          <td style="padding:10px;font-size:11px;color:#475569;max-width:200px"></td>
+          <td style="padding:10px;text-align:center;color:#64748b">—</td>
+          <td style="padding:10px;text-align:right;font-weight:600">
+            —</td>
+          <td style="padding:10px"><div style="display:flex;align-items:center;gap:5px"><div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px"><div style="width:100%;height:6px;background:#22c55e;border-radius:3px"></div></div><span style="font-size:11px;color:#6b7280">0.0%</span></div></td>
+          <td style="padding:10px;text-align:right;color:#1d4ed8;font-weight:600">₹0.00</td>
+          <td style="padding:10px;text-align:right;color:#dc2626">₹730.15</td>
+          <td style="padding:10px;text-align:right;color:#16a34a">₹0.00</td>
+          <td style="padding:10px;text-align:center">1.3x</td>
+          <td style="padding:10px;text-align:center;font-size:11px;color:#475569">0d</td>
+          <td style="padding:10px;font-size:11px;color:#6b7280"></td>
+          <td style="padding:10px"><span style="color:#9ca3af">—</span></td>
+        </tr></tbody>
+  </table>
+  </div>
+
+  <div class="sec-title">✅ Resolved Picks</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th>Symbol</th><th>Pattern</th><th>State</th>
+      <th>Added</th><th>Resolved</th><th>Days</th>
+      <th>Entry</th><th>Exit</th><th>P&L</th><th>Note</th>
+    </tr></thead>
+    <tbody><tr><td colspan="10" style="text-align:center;padding:30px;color:#9ca3af">No resolved picks yet</td></tr></tbody>
+  </table>
+  </div>
+
+  
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;
+                      letter-spacing:.05em;margin-bottom:8px;border-left:3px solid #a855f7;
+                      padding-left:10px">📊 Performance by Pattern</div>
+          <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:10px;font-size:12px;color:#92400e;margin-bottom:10px">⏳ Collecting data — 9 of 30 picks needed. Need 21 more.</div>
+          <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;font-size:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.06)">
+            <thead style="background:#0f172a;color:#fff">
+              <tr><th style="padding:8px 10px;text-align:left">Pattern</th>
+                  <th style="padding:8px 10px">Picks</th>
+                  <th style="padding:8px 10px">Hit Rate</th>
+                  <th style="padding:8px 10px">Avg P&L</th></tr>
+            </thead>
+            <tbody><tr>
+              <td style="padding:6px 10px">None</td>
+              <td style="padding:6px 10px;text-align:center">5</td>
+              <td style="padding:6px 10px;text-align:center;color:#991b1b;font-weight:600">40.0%</td>
+              <td style="padding:6px 10px;text-align:center;color:#166534;font-weight:600">+3.1%</td>
+            </tr></tbody>
+          </table>
+        </div>
+
+</div>
+<p class="note">
+  Track Signal: ON TRACK = gap closing + volume contracting. CAUTION = moving away from entry or volume expanding.
+  ETA = estimated trading days to reach entry at current velocity. Gap = how far last close is from entry level.
+  Performance stats need 30+ resolved picks to be reliable.
+</p>
+</body></html>
