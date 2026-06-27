@@ -1,0 +1,149 @@
+# .github/workflows/daily_run.yml
+#
+# MaverickPICKS — Automated Daily Runner
+# =======================================
+# Runs pattern_detector_v2.py + pattern_tracker.py every weekday
+# at 3:45 PM IST (10:15 AM UTC) — 15 min after NSE market close.
+#
+# Results committed back to repo:
+#   - todays_picks.csv          (today's scanner output)
+#   - pattern_watchlist.json    (persistent watchlist)
+#   - pattern_tracker_log.xlsx  (running Excel log)
+#
+# Setup steps:
+#   1. Push all scripts + NIFTY500_MASTER.csv to this repo
+#   2. GitHub Actions picks this file up automatically
+#   3. Check Actions tab on GitHub to see run logs
+#
+# Free tier: 2,000 min/month. Each run ~20 min = ~400 min/month. Fine.
+
+name: MaverickPICKS Daily Run
+
+on:
+  # ── Scheduled trigger: 10:15 UTC = 3:45 PM IST, Mon-Fri ──────────────────
+  schedule:
+    - cron: '15 10 * * 1-5'   # minute hour day month weekday(1=Mon,5=Fri)
+
+  # ── Manual trigger from GitHub UI (Actions tab → Run workflow) ────────────
+  # Useful for testing and for running on demand on any day
+  workflow_dispatch:
+    inputs:
+      min_score:
+        description: 'Minimum pattern score (default 50)'
+        required: false
+        default: '50'
+      skip_weekly:
+        description: 'Skip weekly confirmation? (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  run-maverick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60       # kill if stuck
+
+    steps:
+
+      # ── 1. Checkout repo ───────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1      # only latest commit needed
+
+      # ── 2. Set up Python ───────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'        # cache pip installs between runs
+
+      # ── 3. Install dependencies ────────────────────────────────────────────
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── 4. Confirm it's a trading day (skip Indian holidays) ───────────────
+      # GitHub Actions doesn't know Indian market holidays.
+      # This step warns in the log but doesn't block — you can
+      # add a holiday list here later if needed.
+      - name: Check trading day
+        run: |
+          python3 - << 'EOF'
+          from datetime import datetime, timezone, timedelta
+          IST = timezone(timedelta(hours=5, minutes=30))
+          now = datetime.now(IST)
+          print(f"Current IST time : {now.strftime('%d-%b-%Y %H:%M IST')}")
+          dow = now.weekday()
+          days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+          print(f"Day of week      : {days[dow]}")
+          if dow >= 5:
+              print("WARNING: Weekend — market closed. Running anyway (manual trigger?)")
+          else:
+              print("Weekday confirmed — proceeding with scan.")
+          EOF
+
+      # ── 5. Run pattern scanner ─────────────────────────────────────────────
+      - name: Run pattern scanner
+        run: |
+          MIN_SCORE="${{ github.event.inputs.min_score || '50' }}"
+          SKIP_WEEKLY="${{ github.event.inputs.skip_weekly || 'false' }}"
+
+          CMD="python pattern_detector_v2.py \
+            --csv_file NIFTY500_MASTER.csv \
+            --lookback 90 \
+            --min_score $MIN_SCORE \
+            --workers 4 \
+            --out_csv todays_picks.csv"
+
+          if [ "$SKIP_WEEKLY" = "true" ]; then
+            CMD="$CMD --no_weekly"
+          fi
+
+          echo "Running: $CMD"
+          eval $CMD
+
+      # ── 6. Import picks + check watchlist ─────────────────────────────────
+      - name: Run tracker (import + check)
+        run: |
+          python pattern_tracker.py \
+            --import_csv todays_picks.csv \
+            --check
+
+      # ── 7. Show tracker status in the Actions log ─────────────────────────
+      - name: Print watchlist status
+        run: python pattern_tracker.py --status
+
+      # ── 8. Commit results back to repo ────────────────────────────────────
+      # This writes the updated watchlist, Excel log, and picks CSV back
+      # to the repo so you can access them from GitHub at any time.
+      - name: Commit results
+        run: |
+          git config user.name  "MaverickPICKS Bot"
+          git config user.email "maverick@noreply.github.com"
+
+          git add \
+            todays_picks.csv \
+            pattern_watchlist.json \
+            pattern_tracker_log.xlsx \
+            logs/ 2>/dev/null || true
+
+          # Only commit if something actually changed
+          if git diff --staged --quiet; then
+            echo "No changes to commit — output unchanged."
+          else
+            DATE=$(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')
+            git commit -m "MaverickPICKS run — $DATE"
+            git push
+          fi
+
+      # ── 9. Upload artifacts (also available as download in Actions tab) ────
+      # Even without git push access, results are downloadable here for 30 days
+      - name: Upload outputs as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()           # upload even if a step failed
+        with:
+          name: maverick-output-${{ github.run_number }}
+          path: |
+            todays_picks.csv
+            pattern_watchlist.json
+            pattern_tracker_log.xlsx
+          retention-days: 30
