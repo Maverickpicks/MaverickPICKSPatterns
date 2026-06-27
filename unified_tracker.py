@@ -134,10 +134,14 @@ def fetch_ohlcv(symbol: str, days: int = 30) -> Optional[pd.DataFrame]:
     """Fetch recent OHLCV — mirrors data_loader.py exactly."""
     end   = _ANCHOR + timedelta(days=1)
     start = _ANCHOR - timedelta(days=days + 10)
+    # Normalise symbol — ensure .NS suffix, strip any accidental double suffix
+    ticker = symbol.replace(".NS.NS", ".NS")
+    if not ticker.endswith(".NS") and not ticker.endswith(".BO"):
+        ticker = ticker + ".NS"
     for attempt in range(3):
         try:
             df = yf.download(
-                symbol if symbol.endswith(".NS") else symbol + ".NS",
+                ticker,
                 start=start, end=end,
                 interval="1d", auto_adjust=False,
                 progress=False, threads=False,
