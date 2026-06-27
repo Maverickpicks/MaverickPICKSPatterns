@@ -2,13 +2,14 @@
 # MaverickPICKS — Full Automated Pipeline
 #
 # Schedule (IST = UTC+5:30):
-#   Mon & Wed 6:00 AM IST (00:30 UTC) → main_v3 scan
-#   Daily     3:45 PM IST (10:15 UTC) → pattern + H&S scan
-#   Daily     4:15 PM IST (10:45 UTC) → unified tracker + dashboards
+#   Mon & Wed 6:00 AM IST (00:30 UTC) -> main_v3 scan
+#   Daily     3:45 PM IST (10:15 UTC) -> pattern + H&S scan
+#   Daily     4:15 PM IST (10:45 UTC) -> unified tracker + dashboards
 #
 # Dashboards:
 #   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_maverick.html
 #   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_patterns.html
+#   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_performance.html
 
 name: MaverickPICKS Pipeline
 
@@ -17,9 +18,9 @@ permissions:
 
 on:
   schedule:
-    - cron: '30 0 * * 1,3'    # main_v3: Mon & Wed 6:00 AM IST
-    - cron: '15 10 * * 1-5'   # pattern scan: daily 3:45 PM IST
-    - cron: '45 10 * * 1-5'   # tracker: daily 4:15 PM IST
+    - cron: '30 0 * * 1,3'
+    - cron: '15 10 * * 1-5'
+    - cron: '45 10 * * 1-5'
 
   workflow_dispatch:
     inputs:
@@ -36,7 +37,6 @@ on:
 
 jobs:
 
-  # ── JOB 1: main_v3 scan — Mon & Wed 6:00 AM IST ────────────────────────────
   main_v3_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -58,17 +58,15 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Verify pandas_ta shim
-        run: python -c "import pandas_ta; print('pandas_ta shim OK — using built-in replacement')"
+        run: python -c "import pandas_ta; print('pandas_ta shim OK')"
 
       - name: Run main_v3
         run: |
-          echo "main_v3 scan — $(TZ='Asia/Kolkata' date)"
+          echo "main_v3 scan -- $(TZ='Asia/Kolkata' date)"
           python main_v3.py
 
       - name: Import picks into unified tracker
-        run: |
-          python unified_tracker.py \
-            --import_maverick MaverickPICKS_Top10_Report.xlsx
+        run: python unified_tracker.py --import_maverick MaverickPICKS_Top10_Report.xlsx
 
       - name: Commit results
         run: |
@@ -80,7 +78,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "main_v3 — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git commit -m "main_v3 -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
             git push
           fi
 
@@ -92,7 +90,6 @@ jobs:
           retention-days: 30
 
 
-  # ── JOB 2: Pattern + H&S scan — daily 3:45 PM IST ──────────────────────────
   pattern_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -119,8 +116,8 @@ jobs:
           from datetime import datetime, timezone, timedelta
           IST = timezone(timedelta(hours=5, minutes=30))
           now = datetime.now(IST)
-          print(f'IST: {now.strftime(\"%d-%b-%Y %H:%M IST\")}')
-          print(f'Day: {now.strftime(\"%A\")}')
+          print('IST:', now.strftime('%d-%b-%Y %H:%M IST'))
+          print('Day:', now.strftime('%A'))
           "
 
       - name: Run Murphy pattern scanner
@@ -133,9 +130,7 @@ jobs:
             --out_csv todays_picks.csv
 
       - name: Run H&S scanner
-        run: |
-          python hs_runner.py --min_quality 40 --workers 3 || \
-            echo "H&S scan failed or no patterns found"
+        run: python hs_runner.py --min_quality 40 --workers 3 || echo "H&S scan skipped"
 
       - name: Import picks into unified tracker
         run: |
@@ -156,7 +151,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Pattern scan — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git commit -m "Pattern scan -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
             git push
           fi
 
@@ -171,7 +166,6 @@ jobs:
           retention-days: 30
 
 
-  # ── JOB 3: Unified tracker check — daily 4:15 PM IST ───────────────────────
   tracker_check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -195,43 +189,11 @@ jobs:
       - name: Run unified tracker
         run: python unified_tracker.py --check
 
-      - name: Daily run summary
-        run: |
-          REPO="${{ github.repository }}"
-          IST_TIME=$(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "  MaverickPICKS DAILY RUN COMPLETE"
-          echo "  Time : $IST_TIME"
-          echo "  Run  : #${{ github.run_number }}"
-          echo ""
-          python3 -c "
-import json, os
-wl = json.load(open('unified_watchlist.json')) if os.path.exists('unified_watchlist.json') else {}
-watching   = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state')=='WATCHING')
-breakouts  = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state')=='BREAKOUT')
-breakdowns = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state') in ('BREAKDOWN','FAILED'))
-print(f'  Watchlist : {watching} watching | {breakouts} breakout(s) | {breakdowns} stop hit')
-for b in ('maverick','patterns','hs'):
-    for p in wl.get(b,{}).values():
-        if p.get('state')=='BREAKOUT':
-            print(f'  ALERT BREAKOUT  : {p[chr(115)+chr(121)+chr(109)+chr(98)+chr(111)+chr(108)]}')
-        elif p.get('state') in ('BREAKDOWN','FAILED'):
-            print(f'  ALERT BREAKDOWN : {p[chr(115)+chr(121)+chr(109)+chr(98)+chr(111)+chr(108)]}')
-ph = json.load(open('performance_history.json')) if os.path.exists('performance_history.json') else {}
-total = len(ph.get('outcomes',[]))
-wins  = sum(1 for o in ph.get('outcomes',[]) if o.get('is_win'))
-print(f'  Performance: {total} resolved | {wins} wins | {total-wins} losses')
-"
-          echo ""
-          echo "  Dashboards (open in browser):"
-          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_maverick.html"
-          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_patterns.html"
-          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_performance.html"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
       - name: Run performance logger
         run: python performance_logger.py
+
+      - name: Print daily summary
+        run: python summary.py
 
       - name: Commit dashboards
         run: |
@@ -244,7 +206,7 @@ print(f'  Performance: {total} resolved | {wins} wins | {total-wins} losses')
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Tracker — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git commit -m "Tracker -- $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
             git push
           fi
 
@@ -256,4 +218,5 @@ print(f'  Performance: {total} resolved | {wins} wins | {total-wins} losses')
             unified_watchlist.json
             dashboard_maverick.html
             dashboard_patterns.html
+            dashboard_performance.html
           retention-days: 30
