@@ -1,41 +1,43 @@
 # .github/workflows/daily_run.yml
-#
 # MaverickPICKS — Full Automated Pipeline
-# =========================================
 #
-# Schedule (all times IST = UTC+5:30):
-#   Mon & Wed  6:00 AM IST  (00:30 UTC Mon/Wed) → main_v3 scan
-#   Daily      3:45 PM IST  (10:15 UTC)          → pattern + H&S scan
-#   Daily      4:15 PM IST  (10:45 UTC)          → unified tracker + dashboards
+# Schedule (IST = UTC+5:30):
+#   Mon & Wed 6:00 AM IST (00:30 UTC) → main_v3 scan
+#   Daily     3:45 PM IST (10:15 UTC) → pattern + H&S scan
+#   Daily     4:15 PM IST (10:45 UTC) → unified tracker + dashboards
 #
-# Dashboard URLs (bookmark these):
-#   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKS/main/dashboard_maverick.html
-#   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKS/main/dashboard_patterns.html
+# Dashboards:
+#   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_maverick.html
+#   https://htmlpreview.github.io/?https://raw.githubusercontent.com/Maverickpicks/MaverickPICKSPatterns/main/dashboard_patterns.html
 
 name: MaverickPICKS Pipeline
 
+# Allow workflow to commit files back to repo
+permissions:
+  contents: write
+
 on:
   schedule:
-    - cron: '30 0 * * 1,3'      # main_v3: Mon & Wed 6:00 AM IST
-    - cron: '15 10 * * 1-5'     # pattern scan: daily 3:45 PM IST
-    - cron: '45 10 * * 1-5'     # tracker: daily 4:15 PM IST
+    - cron: '30 0 * * 1,3'    # main_v3: Mon & Wed 6:00 AM IST
+    - cron: '15 10 * * 1-5'   # pattern scan: daily 3:45 PM IST
+    - cron: '45 10 * * 1-5'   # tracker: daily 4:15 PM IST
 
   workflow_dispatch:
     inputs:
       run_mode:
         description: 'Which job to run?'
         required: true
-        default: 'all'
+        default: 'tracker_only'
         type: choice
         options:
-          - all
-          - main_v3_scan
-          - pattern_scan
           - tracker_only
+          - pattern_scan
+          - main_v3_scan
+          - all
 
 jobs:
 
-  # ── JOB 1: main_v3 scan — Mon & Wed 6:00 AM IST ──────────────────────────
+  # ── JOB 1: main_v3 scan — Mon & Wed 6:00 AM IST ────────────────────────────
   main_v3_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -49,8 +51,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: 'pip' }
-      - run: pip install -r requirements.txt
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Run main_v3
         run: |
@@ -58,15 +63,23 @@ jobs:
           python main_v3.py
 
       - name: Import picks into unified tracker
-        run: python unified_tracker.py --import_maverick MaverickPICKS_Top10_Report.xlsx
-
-      - name: Commit
         run: |
-          git config user.name "MaverickPICKS Bot"
+          python unified_tracker.py \
+            --import_maverick MaverickPICKS_Top10_Report.xlsx
+
+      - name: Commit results
+        run: |
+          git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
+          git pull --rebase origin main 2>/dev/null || true
           git add MaverickPICKS_Top10_Report.xlsx unified_watchlist.json \
                   dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
-          git diff --staged --quiet || (git commit -m "main_v3 — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')" && git push)
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "main_v3 — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git push
+          fi
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -76,7 +89,7 @@ jobs:
           retention-days: 30
 
 
-  # ── JOB 2: Pattern + H&S scan — daily 3:45 PM IST ───────────────────────
+  # ── JOB 2: Pattern + H&S scan — daily 3:45 PM IST ──────────────────────────
   pattern_scan:
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -90,33 +103,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: 'pip' }
-      - run: pip install -r requirements.txt
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check trading day
+        run: |
+          python3 -c "
+          from datetime import datetime, timezone, timedelta
+          IST = timezone(timedelta(hours=5, minutes=30))
+          now = datetime.now(IST)
+          print(f'IST: {now.strftime(\"%d-%b-%Y %H:%M IST\")}')
+          print(f'Day: {now.strftime(\"%A\")}')
+          "
 
       - name: Run Murphy pattern scanner
         run: |
           python pattern_detector_v2.py \
             --csv_file NIFTY500_MASTER.csv \
-            --lookback 90 --min_score 50 --workers 4 \
+            --lookback 90 \
+            --min_score 50 \
+            --workers 4 \
             --out_csv todays_picks.csv
 
       - name: Run H&S scanner
-        run: python hs_runner.py 2>/dev/null || echo "hs_runner.py not found — skipping"
+        run: |
+          python hs_runner.py --min_quality 40 --workers 3 || \
+            echo "H&S scan failed or no patterns found"
 
       - name: Import picks into unified tracker
         run: |
           CMD="python unified_tracker.py --import_patterns todays_picks.csv"
-          [ -f hs_watchlist.csv ] && CMD="$CMD --import_hs hs_watchlist.csv"
+          if [ -f hs_watchlist.csv ]; then
+            CMD="$CMD --import_hs hs_watchlist.csv"
+          fi
           eval $CMD
 
-      - name: Commit
+      - name: Commit results
         run: |
-          git config user.name "MaverickPICKS Bot"
+          git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add todays_picks.csv hs_watchlist.csv unified_watchlist.json \
+          git add todays_picks.csv unified_watchlist.json \
                   dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
-          git diff --staged --quiet || (git commit -m "Pattern scan — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')" && git push)
+          git add hs_watchlist.csv 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Pattern scan — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git push
+          fi
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -129,7 +167,7 @@ jobs:
           retention-days: 30
 
 
-  # ── JOB 3: Unified tracker check — daily 4:15 PM IST ─────────────────────
+  # ── JOB 3: Unified tracker check — daily 4:15 PM IST ───────────────────────
   tracker_check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -143,31 +181,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11', cache: 'pip' }
-      - run: pip install -r requirements.txt
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Run unified tracker
         run: python unified_tracker.py --check
 
-      - name: Print dashboard URLs
+      - name: Show dashboard URLs
         run: |
           REPO="${{ github.repository }}"
           echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "  MaverickPICKS Dashboard:"
           echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_maverick.html"
           echo ""
           echo "  Patterns Dashboard:"
           echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_patterns.html"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
       - name: Commit dashboards
         run: |
-          git config user.name "MaverickPICKS Bot"
+          git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add unified_watchlist.json dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
-          git diff --staged --quiet || (git commit -m "Tracker — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')" && git push)
+          git add unified_watchlist.json \
+                  dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Tracker — $(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')"
+            git push
+          fi
 
       - uses: actions/upload-artifact@v4
         if: always()
