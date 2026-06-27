@@ -12,7 +12,6 @@
 
 name: MaverickPICKS Pipeline
 
-# Allow workflow to commit files back to repo
 permissions:
   contents: write
 
@@ -54,8 +53,21 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-      - name: Install dependencies
+
+      - name: Install base dependencies
         run: pip install -r requirements.txt
+
+      - name: Install pandas_ta (main_v3 only)
+        run: |
+          pip install --pre pandas_ta || \
+          pip install pandas_ta --index-url https://pypi.org/simple/ || \
+          pip install ta-lib 2>/dev/null || \
+          echo "pandas_ta install failed — trying fallback"
+          python -c "import pandas_ta" 2>/dev/null || \
+          pip install https://github.com/twopirllc/pandas-ta/archive/refs/heads/main.zip
+
+      - name: Verify pandas_ta
+        run: python -c "import pandas_ta; print('pandas_ta OK')"
 
       - name: Run main_v3
         run: |
@@ -92,7 +104,7 @@ jobs:
   # ── JOB 2: Pattern + H&S scan — daily 3:45 PM IST ──────────────────────────
   pattern_scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     if: >
       (github.event_name == 'workflow_dispatch' &&
        (github.event.inputs.run_mode == 'pattern_scan' ||
@@ -106,6 +118,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
@@ -184,6 +197,7 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
