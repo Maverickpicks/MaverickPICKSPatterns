@@ -13,7 +13,7 @@ on:
       run_mode:
         description: 'Which job to run?'
         required: true
-        default: 'tracker_only'
+        default: 'pattern_and_track'
         type: choice
         options:
           - pattern_and_track
@@ -76,9 +76,9 @@ jobs:
         run: |
           MODE="${{ github.event.inputs.run_mode }}"
           if [ "$MODE" = "tracker_only" ]; then
-            echo "tracker_only mode -- skipping scanner"
-            touch todays_picks.csv
-            touch hs_watchlist.csv
+            echo "tracker_only mode -- using existing todays_picks.csv from repo"
+            echo "todays_picks.csv: $(wc -l < todays_picks.csv 2>/dev/null || echo MISSING) rows"
+            echo "hs_watchlist.csv: $(wc -l < hs_watchlist.csv 2>/dev/null || echo MISSING) rows"
           else
             echo "Running Murphy pattern scanner..."
             python pattern_detector_v2.py \
