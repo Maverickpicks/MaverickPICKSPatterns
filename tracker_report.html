@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaverickPICKS Tracker</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e0e0e0; padding: 20px; }
+.container { max-width: 1440px; margin: 0 auto; }
+h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; color: #fff; }
+.subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+.page-layout { display: flex; gap: 20px; align-items: flex-start; }
+.sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 20px; }
+@media (max-width: 1000px) { .page-layout { flex-direction: column; } .sidebar { width: 100%; position: static; } }
+.main-content { flex: 1; min-width: 0; }
+.sb-card { background: #1a1d27; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+.sb-title { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.sb-big { font-size: 28px; font-weight: 600; text-align: center; margin: 8px 0; }
+.sb-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1f2130; font-size: 13px; }
+.sb-row:last-child { border-bottom: none; }
+.sb-row .lbl { color: #888; }
+.sb-row .val { font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 500; }
+.lb-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; margin-bottom: 4px; background: #12141c; border-radius: 6px; font-size: 12px; }
+.lb-rank { color: #666; width: 20px; }
+.lb-sym { font-weight: 500; flex: 1; color: #fff; margin-left: 6px; }
+.lb-pnl { font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 600; }
+.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.sum-card { background: #1a1d27; border-radius: 8px; padding: 12px; text-align: center; }
+.sum-num { font-size: 22px; font-weight: 600; }
+.sum-label { font-size: 10px; color: #888; margin-top: 3px; }
+.green { color: #34d399; }
+.red { color: #f87171; }
+.amber { color: #fbbf24; }
+.blue { color: #60a5fa; }
+.muted { color: #888; }
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.filter-label { font-size: 12px; color: #888; margin-right: 4px; }
+.filter-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid #2a2d3a; background: #1a1d27; color: #aaa; cursor: pointer; }
+.filter-btn:hover { border-color: #60a5fa; color: #fff; }
+.filter-btn.active { background: #1e3a5f; border-color: #60a5fa; color: #60a5fa; }
+.picks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 1000px) { .picks-grid { grid-template-columns: 1fr; } }
+.pick-card { background: #1a1d27; border-radius: 10px; padding: 16px; border-left: 4px solid #333; }
+.pick-card.action-hold { border-left-color: #60a5fa; }
+.pick-card.action-add { border-left-color: #34d399; }
+.pick-card.action-book { border-left-color: #fbbf24; }
+.pick-card.action-exit { border-left-color: #f87171; }
+.pick-card.action-waiting { border-left-color: #a78bfa; }
+.pick-card.action-expired { border-left-color: #666; opacity: 0.6; }
+.pick-card.hidden { display: none; }
+.pick-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.pick-sym { font-size: 16px; font-weight: 600; color: #fff; }
+.pick-pnl { font-size: 16px; font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; }
+.tag { font-size: 10px; padding: 2px 6px; border-radius: 5px; display: inline-block; margin-left: 4px; }
+.tag-green { background: #064e3b; color: #34d399; }
+.tag-red { background: #450a0a; color: #f87171; }
+.tag-amber { background: #451a03; color: #fbbf24; }
+.tag-blue { background: #1e3a5f; color: #60a5fa; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(75px, 1fr)); gap: 6px; margin-bottom: 10px; }
+.metric { background: #12141c; border-radius: 5px; padding: 6px 8px; }
+.m-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+.m-value { font-size: 13px; font-weight: 500; font-family: 'SF Mono', 'Fira Code', monospace; margin-top: 1px; }
+.engine-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.engine-tag { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: #12141c; color: #aaa; }
+.recommendation { background: #12141c; border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.5; }
+.rec-title { font-weight: 600; margin-bottom: 3px; font-size: 13px; }
+.history { margin-top: 10px; }
+.history-title { font-size: 11px; color: #666; margin-bottom: 4px; cursor: pointer; }
+.history-row { font-size: 10px; color: #777; padding: 2px 0; font-family: 'SF Mono', 'Fira Code', monospace; border-bottom: 1px solid #1f2130; }
+.completed-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #2a2d3a; }
+.completed-section h2 { font-size: 16px; color: #888; margin-bottom: 12px; }
+.completed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 1000px) { .completed-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>MaverickPICKS tracker</h1>
+<p class="subtitle">Report generated: 26 Jun 2026, 08:20 &nbsp;|&nbsp; Last data update: 2026-06-26 08:20:06</p>
+
+<div class="page-layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-card">
+    <div class="sb-title">Portfolio (₹10,000 per stock)</div>
+    <div class="sb-big" id="sb-pnl-pct">—</div>
+    <div style="text-align:center;font-size:11px;color:#888;margin-bottom:10px">avg P&L</div>
+    <div class="sb-row"><span class="lbl">Active picks</span><span class="val" id="sb-count">0</span></div>
+    <div class="sb-row"><span class="lbl">Invested</span><span class="val" id="sb-invested">₹0</span></div>
+    <div class="sb-row"><span class="lbl">Current value</span><span class="val" id="sb-current">₹0</span></div>
+    <div class="sb-row"><span class="lbl">P&L (₹)</span><span class="val" id="sb-pnl-abs">₹0</span></div>
+    <div class="sb-row"><span class="lbl">Best</span><span class="val green" id="sb-best">—</span></div>
+    <div class="sb-row"><span class="lbl">Worst</span><span class="val red" id="sb-worst">—</span></div>
+  </div>
+  <div class="sb-card">
+    <div class="sb-title">Leaderboard</div>
+    <div id="sb-leaderboard"></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+<div class="summary">
+  <div class="sum-card"><div class="sum-num amber" id="stat-pending">2</div><div class="sum-label">Pending entry</div></div>
+  <div class="sum-card"><div class="sum-num blue" id="stat-active">19</div><div class="sum-label">Active</div></div>
+  <div class="sum-card"><div class="sum-num green" id="stat-profit">14</div><div class="sum-label">In profit</div></div>
+  <div class="sum-card"><div class="sum-num red" id="stat-loss">5</div><div class="sum-label">In loss</div></div>
+  <div class="sum-card"><div class="sum-num green" id="stat-avgpnl">+1.5%</div><div class="sum-label">Avg P&L</div></div>
+  <div class="sum-card"><div class="sum-num green" id="stat-t1">3</div><div class="sum-label">T1 hit</div></div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Suggested on:</span>
+  <button class="filter-btn active" onclick="filterPicks('all')">All</button>
+  <button class="filter-btn" onclick="filterPicks('2026-06-22')">Mon 22 Jun</button>
+  <button class="filter-btn" onclick="filterPicks('2026-06-16')">Tue 16 Jun</button>
+</div>
+<div class="picks-grid">
+
+<div class="pick-card action-waiting" data-pick-date="2026-06-22" data-status="PENDING" data-pnl="0" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">NESTLEIND</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+      <span class="tag" style="background:#2d2150;color:#a78bfa">PENDING</span>
+      <span class="tag tag-amber">1 trading days left</span>
+    </div>
+    <span class="pick-pnl amber">-0.9%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry level</div><div class="m-value">₹1414.80</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1402.60</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1368.68</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1476.30</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1522.42</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: WEAK</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: DRY_PULLBACK</span><span class="engine-tag">RSI: 50</span><span class="engine-tag" style="color:#a78bfa">AVOID</span></div>
+  <div class="recommendation" style="border-left: 3px solid #a78bfa; border-radius: 0;">
+    <div class="rec-title" style="color:#a78bfa">WAITING FOR ENTRY</div>
+    Stock at ₹1402.6, just 0.9% below entry ₹1414.8. Very close — a small move up would confirm entry. WARNING: Current re-scan verdict is AVOID. Original SUPPORT_BOUNCE setup may be deteriorating — trend: WEAK, momentum: WEAK. Price near support — may trigger entry soon. 1 trading day(s) remaining before this pick expires.
+  </div>
+</div>
+
+<div class="pick-card action-waiting" data-pick-date="2026-06-22" data-status="PENDING" data-pnl="0" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">NESTLEIND</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+      <span class="tag" style="background:#2d2150;color:#a78bfa">PENDING</span>
+      <span class="tag tag-amber">1 trading days left</span>
+    </div>
+    <span class="pick-pnl amber">-0.9%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry level</div><div class="m-value">₹1414.80</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1402.60</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1368.68</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1476.30</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1522.42</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: WEAK</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: DRY_PULLBACK</span><span class="engine-tag">RSI: 50</span><span class="engine-tag" style="color:#a78bfa">AVOID</span></div>
+  <div class="recommendation" style="border-left: 3px solid #a78bfa; border-radius: 0;">
+    <div class="rec-title" style="color:#a78bfa">WAITING FOR ENTRY</div>
+    Stock at ₹1402.6, just 0.9% below entry ₹1414.8. Very close — a small move up would confirm entry. WARNING: Current re-scan verdict is AVOID. Original SUPPORT_BOUNCE setup may be deteriorating — trend: WEAK, momentum: WEAK. Price near support — may trigger entry soon. 1 trading day(s) remaining before this pick expires.
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="3.45" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">HBLENGINE</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+3.5%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹799.65</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹827.25</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹756.89</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹856.66</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹899.41</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">81%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 61</span><span class="engine-tag" style="color:#fbbf24">WATCHLIST</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹827.25 (+3.5%), 3.6% away from T1 (₹856.66). Estimated ~3 trading days to T1 at current pace. Trend: LEADER, Momentum: STRONG, Volume: NORMAL, RSI: 61. Thesis intact — continue holding. 📉 IF price slips back to ₹799.65: hold as long as it stays above ₹756.89. IF price breaks ₹805.75 with rising volume: tighten SL to ₹805.75. 🎯 AT T1 (₹856.66): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹    795.95  <span style="color:#f87171">  -0.5%</span>  HOLD</div><div class="history-row">2026-06-18  ₹    804.40  <span style="color:#34d399">  +0.6%</span>  HOLD</div><div class="history-row">2026-06-19  ₹    815.50  <span style="color:#34d399">  +2.0%</span>  HOLD</div><div class="history-row">2026-06-22  ₹    817.65  <span style="color:#34d399">  +2.2%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    820.55  <span style="color:#34d399">  +2.6%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    823.10  <span style="color:#34d399">  +2.9%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    827.25  <span style="color:#34d399">  +3.5%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="-2.86" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">PETRONET</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl red">-2.9%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹290.55</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹282.25</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹279.58</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹305.17</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹316.14</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">80%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: STRONG</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: DRY_PULLBACK</span><span class="engine-tag">RSI: 54</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    Price at ₹282.25 (-2.9%). Trend: STRONG, Momentum: WEAK, RSI: 54. No clear exit signal yet. 📉 IF drops to ₹279.58: exit immediately. 📈 IF closes above ₹290.55 with volume: thesis reactivates toward T1 (₹305.17).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹    292.00  <span style="color:#34d399">  +0.5%</span>  HOLD</div><div class="history-row">2026-06-18  ₹    288.25  <span style="color:#f87171">  -0.8%</span>  HOLD</div><div class="history-row">2026-06-19  ₹    288.70  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-22  ₹    286.50  <span style="color:#f87171">  -1.4%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    284.95  <span style="color:#f87171">  -1.9%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    287.85  <span style="color:#f87171">  -0.9%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    282.25  <span style="color:#f87171">  -2.9%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="2.64" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">PNBHOUSING</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">RECOVERY</span>
+    </div>
+    <span class="pick-pnl green">+2.6%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1017.90</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1044.80</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹972.36</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1078.63</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1124.17</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">78%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: IMPROVING</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 59</span><span class="engine-tag">Pattern: HHHL</span><span class="engine-tag" style="color:#34d399">BUY</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹1044.8 (+2.6%), 3.2% away from T1 (₹1078.63). Estimated ~3 trading days to T1 at current pace. Trend: LEADER, Momentum: IMPROVING, Volume: NORMAL, RSI: 59. Thesis intact — continue holding. 📉 IF price slips back to ₹1017.9: hold as long as it stays above ₹972.36. IF price breaks ₹955.55 with rising volume: tighten SL to ₹955.55. 🎯 AT T1 (₹1078.63): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹   1003.50  <span style="color:#f87171">  -1.4%</span>  HOLD</div><div class="history-row">2026-06-18  ₹   1003.90  <span style="color:#f87171">  -1.4%</span>  HOLD</div><div class="history-row">2026-06-19  ₹   1003.00  <span style="color:#f87171">  -1.5%</span>  HOLD</div><div class="history-row">2026-06-22  ₹   1010.40  <span style="color:#f87171">  -0.7%</span>  HOLD</div><div class="history-row">2026-06-23  ₹   1022.30  <span style="color:#34d399">  +0.4%</span>  HOLD</div><div class="history-row">2026-06-24  ₹   1046.50  <span style="color:#34d399">  +2.8%</span>  HOLD</div><div class="history-row">2026-06-25  ₹   1044.80  <span style="color:#34d399">  +2.6%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="1.09" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">ANURAS</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">RECOVERY</span>
+    </div>
+    <span class="pick-pnl green">+1.1%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1261.40</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1275.10</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1208.20</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1352.34</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1420.55</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">76%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: NEUTRAL</span><span class="engine-tag">Mom: IMPROVING</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 43</span><span class="engine-tag">Pattern: Inside Bar</span><span class="engine-tag" style="color:#f87171">AVOID</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    In modest profit at ₹1275.1 (+1.1%), 6.1% from T1 (₹1352.34). Estimated ~7 trading days to T1 at current pace. Trend: NEUTRAL, Momentum: IMPROVING. 📉 IF price slips to ₹1261.4: still within plan, hold with SL at ₹1208.2. 🎯 AT T1 (₹1352.34): reassess based on RSI and volume at that point.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹   1294.50  <span style="color:#34d399">  +2.6%</span>  HOLD</div><div class="history-row">2026-06-18  ₹   1287.30  <span style="color:#34d399">  +2.0%</span>  HOLD</div><div class="history-row">2026-06-19  ₹   1277.10  <span style="color:#34d399">  +1.2%</span>  HOLD</div><div class="history-row">2026-06-22  ₹   1282.30  <span style="color:#34d399">  +1.7%</span>  HOLD</div><div class="history-row">2026-06-23  ₹   1270.70  <span style="color:#34d399">  +0.7%</span>  HOLD</div><div class="history-row">2026-06-24  ₹   1281.10  <span style="color:#34d399">  +1.6%</span>  HOLD</div><div class="history-row">2026-06-25  ₹   1275.10  <span style="color:#34d399">  +1.1%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="-2.14" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">HUDCO</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl red">-2.1%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹212.83</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹208.27</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹203.61</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹225.13</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹234.35</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">71%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: STRONG</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 50</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    Price at ₹208.27 (-2.1%), testing support. Trend still STRONG, EMA structure intact. Hold with SL at ₹203.61 — support holding is a positive sign. 📈 IF bounces with volume confirmation: setup reactivates toward T1 (₹225.13). 📉 IF closes below ₹203.61: exit, thesis is broken.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹    213.65  <span style="color:#34d399">  +0.4%</span>  HOLD</div><div class="history-row">2026-06-18  ₹    211.55  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-19  ₹    208.65  <span style="color:#f87171">  -2.0%</span>  HOLD</div><div class="history-row">2026-06-22  ₹    211.40  <span style="color:#f87171">  -0.7%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    208.81  <span style="color:#f87171">  -1.9%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    207.98  <span style="color:#f87171">  -2.3%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    208.27  <span style="color:#f87171">  -2.1%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-book" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="7.02" data-t1-hit="true">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">RADICO</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">RECOVERY</span><span class="tag tag-green">T1 hit 2026-06-19</span>
+    </div>
+    <span class="pick-pnl green">+7.0%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹3578.70</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹3829.80</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹3447.01</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹3754.29</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹3885.98</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">70%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: LEADER</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 72</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#fbbf24">BOOK PARTIAL</div>
+    ⚠️ T1 hit but RSI overbought at 72 — momentum may fade. Book 50% at ₹3829.8. Trail remaining with SL at ₹3641.66. 📉 IF RSI drops below 60 with falling volume: book remaining too. 📈 IF RSI cools to 55-65 and holds above ₹3641.66: continue holding for T2.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹   3572.20  <span style="color:#f87171">  -0.2%</span>  HOLD</div><div class="history-row">2026-06-18  ₹   3690.00  <span style="color:#34d399">  +3.1%</span>  HOLD</div><div class="history-row">2026-06-19  ₹   3769.20  <span style="color:#34d399">  +5.3%</span>  BOOK_PARTIAL</div><div class="history-row">2026-06-22  ₹   3778.60  <span style="color:#34d399">  +5.6%</span>  BOOK_PARTIAL</div><div class="history-row">2026-06-23  ₹   3718.90  <span style="color:#34d399">  +3.9%</span>  HOLD</div><div class="history-row">2026-06-24  ₹   3757.70  <span style="color:#34d399">  +5.0%</span>  HOLD</div><div class="history-row">2026-06-25  ₹   3829.80  <span style="color:#34d399">  +7.0%</span>  BOOK_PARTIAL</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-16" data-status="ACTIVE" data-pnl="-4.36" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">JUBLINGREA</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">16 Jun</span>
+      <span class="tag tag-blue">RECOVERY</span>
+    </div>
+    <span class="pick-pnl red">-4.4%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹650.00</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹621.65</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹615.52</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹695.98</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹730.46</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">8</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">68%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: NEUTRAL</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 38</span><span class="engine-tag">Pattern: Inside Bar</span><span class="engine-tag" style="color:#f87171">AVOID</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    Price at ₹621.65 (-4.4%). Trend: NEUTRAL, Momentum: WEAK, RSI: 38. No clear exit signal yet. 📉 IF drops to ₹615.52: exit immediately. 📈 IF closes above ₹650.0 with volume: thesis reactivates toward T1 (₹695.98).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 7 entries)</div>
+    <div class="history-row">2026-06-17  ₹    649.10  <span style="color:#f87171">  -0.1%</span>  HOLD</div><div class="history-row">2026-06-18  ₹    646.00  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-19  ₹    637.65  <span style="color:#f87171">  -1.9%</span>  HOLD</div><div class="history-row">2026-06-22  ₹    645.60  <span style="color:#f87171">  -0.7%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    629.90  <span style="color:#f87171">  -3.1%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    631.90  <span style="color:#f87171">  -2.8%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    621.65  <span style="color:#f87171">  -4.4%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-book" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="8.49" data-t1-hit="true">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">MSUMI</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span><span class="tag tag-green">T1 hit 2026-06-25</span>
+    </div>
+    <span class="pick-pnl green">+8.5%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹38.03</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹41.26</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹36.40</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹40.21</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹41.84</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">85%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: NEUTRAL</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 65</span><span class="engine-tag">Pattern: Morning Star</span><span class="engine-tag" style="color:#34d399">BUY</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#fbbf24">BOOK PARTIAL</div>
+    T1 reached at ₹41.26. Mixed signals — Trend: NEUTRAL, Momentum: STRONG, RSI: 65. Book 50% now, trail rest with SL at ₹39.0. 📉 IF drops below ₹39.0: exit remaining. 📈 IF trend strengthens with volume: hold for T2 (₹41.84).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹     38.39  <span style="color:#34d399">  +0.9%</span>  HOLD</div><div class="history-row">2026-06-23  ₹     37.81  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-24  ₹     37.82  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-25  ₹     41.26  <span style="color:#34d399">  +8.5%</span>  BOOK_PARTIAL</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="4.36" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">LTF</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+4.4%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹286.50</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹299.00</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹273.07</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹304.41</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹317.84</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">82%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 63</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#34d399">BUY</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹299.0 (+4.4%), 1.8% away from T1 (₹304.41). Estimated ~1 trading days to T1 at current pace. Trend: LEADER, Momentum: STRONG, Volume: NORMAL, RSI: 63. Thesis intact — continue holding. 📉 IF price slips back to ₹286.5: hold as long as it stays above ₹273.07. IF price breaks ₹278.44 with rising volume: tighten SL to ₹278.44. 🎯 AT T1 (₹304.41): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    288.70  <span style="color:#34d399">  +0.8%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    286.35  <span style="color:#f87171">  -0.1%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    296.55  <span style="color:#34d399">  +3.5%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    299.00  <span style="color:#34d399">  +4.4%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="-4.7" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">JBMA</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">LEADER</span>
+    </div>
+    <span class="pick-pnl red">-4.7%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹727.30</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹693.10</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹686.11</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹782.22</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹823.42</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">80%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: ACCUMULATION</span><span class="engine-tag">RSI: 55</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    Price at ₹693.1 (-4.7%). Trend: LEADER, Momentum: WEAK, RSI: 55. No clear exit signal yet. 📉 IF drops to ₹686.11: exit immediately. 📈 IF closes above ₹727.3 with volume: thesis reactivates toward T1 (₹782.22).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    728.10  <span style="color:#34d399">  +0.1%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    716.90  <span style="color:#f87171">  -1.4%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    704.50  <span style="color:#f87171">  -3.1%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    693.10  <span style="color:#f87171">  -4.7%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.44" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">HBLENGINE</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+1.4%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹815.50</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹827.25</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹773.93</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹870.92</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹912.49</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">78%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 61</span><span class="engine-tag" style="color:#fbbf24">WATCHLIST</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹827.25 (+1.4%), 5.3% away from T1 (₹870.92). Estimated ~5 trading days to T1 at current pace. Trend: LEADER, Momentum: STRONG, Volume: NORMAL, RSI: 61. Thesis intact — continue holding. 📉 IF price slips back to ₹815.5: hold as long as it stays above ₹773.93. IF price breaks ₹805.75 with rising volume: tighten SL to ₹805.75. 🎯 AT T1 (₹870.92): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    817.65  <span style="color:#34d399">  +0.3%</span>  HOLD</div><div class="history-row">2026-06-23  ₹    820.55  <span style="color:#34d399">  +0.6%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    823.10  <span style="color:#34d399">  +0.9%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    827.25  <span style="color:#34d399">  +1.4%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.25" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">PHOENIXLTD</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">LEADER</span>
+    </div>
+    <span class="pick-pnl green">+1.2%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1881.10</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1904.60</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1801.50</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1987.23</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹2066.83</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">73%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: LEADER</span><span class="engine-tag">Vol: ACCUMULATION</span><span class="engine-tag">RSI: 65</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹1904.6 (+1.2%), 4.3% away from T1 (₹1987.23). Estimated ~3 trading days to T1 at current pace. Trend: LEADER, Momentum: LEADER, Volume: ACCUMULATION, RSI: 65. Thesis intact — continue holding. 📉 IF price slips back to ₹1881.1: hold as long as it stays above ₹1801.5. IF price breaks ₹1676.88 with rising volume: tighten SL to ₹1676.88. 🎯 AT T1 (₹1987.23): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹   1871.10  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-23  ₹   1851.60  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-24  ₹   1912.30  <span style="color:#34d399">  +1.7%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-25  ₹   1904.60  <span style="color:#34d399">  +1.2%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.22" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">AAVAS</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+1.2%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1471.90</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1489.90</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1403.03</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1563.73</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1632.61</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">70%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: STRONG</span><span class="engine-tag">Mom: LEADER</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 68</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹1489.9 (+1.2%), 5.0% away from T1 (₹1563.73). Estimated ~3 trading days to T1 at current pace. Trend: STRONG, Momentum: LEADER, Volume: DRY, RSI: 68. Thesis intact — continue holding. 📉 IF price slips back to ₹1471.9: hold as long as it stays above ₹1403.03. IF price breaks ₹1434.37 with rising volume: tighten SL to ₹1434.37. 🎯 AT T1 (₹1563.73): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹   1466.60  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-23  ₹   1452.20  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-24  ₹   1482.60  <span style="color:#34d399">  +0.7%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-25  ₹   1489.90  <span style="color:#34d399">  +1.2%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-book" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="8.49" data-t1-hit="true">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">MSUMI</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span><span class="tag tag-green">T1 hit 2026-06-25</span>
+    </div>
+    <span class="pick-pnl green">+8.5%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹38.03</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹41.26</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹36.40</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹40.21</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹41.84</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">85%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: NEUTRAL</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 65</span><span class="engine-tag">Pattern: Morning Star</span><span class="engine-tag" style="color:#34d399">BUY</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#fbbf24">BOOK PARTIAL</div>
+    T1 reached at ₹41.26. Mixed signals — Trend: NEUTRAL, Momentum: STRONG, RSI: 65. Book 50% now, trail rest with SL at ₹39.0. 📉 IF drops below ₹39.0: exit remaining. 📈 IF trend strengthens with volume: hold for T2 (₹41.84).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹     38.39  <span style="color:#34d399">  +0.9%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-23  ₹     37.81  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-24  ₹     37.82  <span style="color:#f87171">  -0.6%</span>  HOLD</div><div class="history-row">2026-06-25  ₹     41.26  <span style="color:#34d399">  +8.5%</span>  BOOK_PARTIAL</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="4.36" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">LTF</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+4.4%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹286.50</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹299.00</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹273.07</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹304.41</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹317.84</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">82%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 63</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#34d399">BUY</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹299.0 (+4.4%), 1.8% away from T1 (₹304.41). Estimated ~1 trading days to T1 at current pace. Trend: LEADER, Momentum: STRONG, Volume: NORMAL, RSI: 63. Thesis intact — continue holding. 📉 IF price slips back to ₹286.5: hold as long as it stays above ₹273.07. IF price breaks ₹278.44 with rising volume: tighten SL to ₹278.44. 🎯 AT T1 (₹304.41): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    288.70  <span style="color:#34d399">  +0.8%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-23  ₹    286.35  <span style="color:#f87171">  -0.1%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    296.55  <span style="color:#34d399">  +3.5%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    299.00  <span style="color:#34d399">  +4.4%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="-4.7" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">JBMA</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">LEADER</span>
+    </div>
+    <span class="pick-pnl red">-4.7%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹727.30</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹693.10</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹686.11</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹782.22</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹823.42</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">80%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: WEAK</span><span class="engine-tag">Vol: ACCUMULATION</span><span class="engine-tag">RSI: 55</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    Price at ₹693.1 (-4.7%). Trend: LEADER, Momentum: WEAK, RSI: 55. No clear exit signal yet. 📉 IF drops to ₹686.11: exit immediately. 📈 IF closes above ₹727.3 with volume: thesis reactivates toward T1 (₹782.22).
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    728.10  <span style="color:#34d399">  +0.1%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-23  ₹    716.90  <span style="color:#f87171">  -1.4%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    704.50  <span style="color:#f87171">  -3.1%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    693.10  <span style="color:#f87171">  -4.7%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.44" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">HBLENGINE</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+1.4%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹815.50</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹827.25</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹773.93</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹870.92</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹912.49</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">78%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: STRONG</span><span class="engine-tag">Vol: NORMAL</span><span class="engine-tag">RSI: 61</span><span class="engine-tag" style="color:#fbbf24">WATCHLIST</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹827.25 (+1.4%), 5.3% away from T1 (₹870.92). Estimated ~5 trading days to T1 at current pace. Trend: LEADER, Momentum: STRONG, Volume: NORMAL, RSI: 61. Thesis intact — continue holding. 📉 IF price slips back to ₹815.5: hold as long as it stays above ₹773.93. IF price breaks ₹805.75 with rising volume: tighten SL to ₹805.75. 🎯 AT T1 (₹870.92): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹    817.65  <span style="color:#34d399">  +0.3%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-23  ₹    820.55  <span style="color:#34d399">  +0.6%</span>  HOLD</div><div class="history-row">2026-06-24  ₹    823.10  <span style="color:#34d399">  +0.9%</span>  HOLD</div><div class="history-row">2026-06-25  ₹    827.25  <span style="color:#34d399">  +1.4%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.25" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">PHOENIXLTD</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">LEADER</span>
+    </div>
+    <span class="pick-pnl green">+1.2%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1881.10</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1904.60</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1801.50</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1987.23</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹2066.83</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">73%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: LEADER</span><span class="engine-tag">Mom: LEADER</span><span class="engine-tag">Vol: ACCUMULATION</span><span class="engine-tag">RSI: 65</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹1904.6 (+1.2%), 4.3% away from T1 (₹1987.23). Estimated ~3 trading days to T1 at current pace. Trend: LEADER, Momentum: LEADER, Volume: ACCUMULATION, RSI: 65. Thesis intact — continue holding. 📉 IF price slips back to ₹1881.1: hold as long as it stays above ₹1801.5. IF price breaks ₹1676.88 with rising volume: tighten SL to ₹1676.88. 🎯 AT T1 (₹1987.23): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹   1871.10  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-23  ₹   1851.60  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-24  ₹   1912.30  <span style="color:#34d399">  +1.7%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-25  ₹   1904.60  <span style="color:#34d399">  +1.2%</span>  HOLD</div>
+  </div>
+</div>
+
+<div class="pick-card action-hold" data-pick-date="2026-06-22" data-status="ACTIVE" data-pnl="1.22" data-t1-hit="false">
+  <div class="pick-header">
+    <div>
+      <span class="pick-sym">AAVAS</span>
+      <span class="tag" style="background:#1a1d27;color:#666;border:1px solid #333">22 Jun</span>
+      <span class="tag tag-blue">SUPPORT_BOUNCE</span>
+    </div>
+    <span class="pick-pnl green">+1.2%</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Entry</div><div class="m-value">₹1471.90</div></div>
+    <div class="metric"><div class="m-label">Current</div><div class="m-value">₹1489.90</div></div>
+    <div class="metric"><div class="m-label">SL</div><div class="m-value">₹1403.03</div></div>
+    <div class="metric"><div class="m-label">T1</div><div class="m-value">₹1563.73</div></div>
+    <div class="metric"><div class="m-label">T2</div><div class="m-value">₹1632.61</div></div>
+    <div class="metric"><div class="m-label">Day</div><div class="m-value">4</div></div>
+    <div class="metric"><div class="m-label">Confidence</div><div class="m-value">70%</div></div>
+  </div>
+  <div class="engine-bar"><span class="engine-tag">Trend: STRONG</span><span class="engine-tag">Mom: LEADER</span><span class="engine-tag">Vol: DRY</span><span class="engine-tag">RSI: 68</span><span class="engine-tag">Pattern: Double Bottom</span><span class="engine-tag" style="color:#60a5fa">NEUTRAL</span></div>
+  <div class="recommendation">
+    <div class="rec-title" style="color:#60a5fa">HOLD</div>
+    📈 In profit at ₹1489.9 (+1.2%), 5.0% away from T1 (₹1563.73). Estimated ~3 trading days to T1 at current pace. Trend: STRONG, Momentum: LEADER, Volume: DRY, RSI: 68. Thesis intact — continue holding. 📉 IF price slips back to ₹1471.9: hold as long as it stays above ₹1403.03. IF price breaks ₹1434.37 with rising volume: tighten SL to ₹1434.37. 🎯 AT T1 (₹1563.73): if RSI < 70 and volume healthy, hold for T2. If RSI > 70, book 50%.
+  </div>
+  <div class="history">
+    <div class="history-title">Daily log (last 4 entries)</div>
+    <div class="history-row">2026-06-22  ₹   1466.60  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-23  ₹   1452.20  <span style="color:#888">  +0.0%</span>  WAITING</div><div class="history-row">2026-06-24  ₹   1482.60  <span style="color:#34d399">  +0.7%</span>  ENTRY_TRIGGERED</div><div class="history-row">2026-06-25  ₹   1489.90  <span style="color:#34d399">  +1.2%</span>  HOLD</div>
+  </div>
+</div>
+</div><div class="completed-section"><h2>Completed picks</h2><div class="completed-grid">
+<div class="pick-card" style="border-left-color: #34d399; opacity: 0.7;">
+  <div class="pick-header">
+    <span class="pick-sym">SCHNEIDER <span class="tag tag-green">COMPLETED_T2</span></span>
+    <span class="pick-pnl green">+22.1%</span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-16 | Entry: ₹1181.40 | Exit: ₹1442.2 on 2026-06-23
+    <br>🎯 Target 2 reached at ₹1442.2 (T2 was ₹1417.47). P&L: +22.1%. Full target achieved — book profits and move on.
+  </div>
+</div>
+<div class="pick-card" style="border-left-color: #f87171; opacity: 0.7;">
+  <div class="pick-header">
+    <span class="pick-sym">HINDALCO <span class="tag tag-red">COMPLETED_SL</span></span>
+    <span class="pick-pnl red">-5.6%</span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-19 | Entry: ₹1010.00 | Exit: ₹953.2 on 2026-06-25
+    <br>⛔ Stop loss breached — closed at ₹953.2 below SL ₹970.0. Trend: WEAK, Momentum: WEAK. Exit to preserve capital. Do not average down.
+  </div>
+</div>
+<div class="pick-card" style="border-left-color: #f87171; opacity: 0.7;">
+  <div class="pick-header">
+    <span class="pick-sym">SAIL <span class="tag tag-red">COMPLETED_SL</span></span>
+    <span class="pick-pnl red">-3.4%</span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-16 | Entry: ₹180.99 | Exit: ₹174.85 on 2026-06-22
+    <br>⛔ Stop loss breached — closed at ₹174.85 below SL ₹178.71. Trend: WEAK, Momentum: WEAK. Exit to preserve capital. Do not average down.
+  </div>
+</div>
+<div class="pick-card" style="border-left-color: #34d399; opacity: 0.7;">
+  <div class="pick-header">
+    <span class="pick-sym">ANANDRATHI <span class="tag tag-green">COMPLETED_T2</span></span>
+    <span class="pick-pnl green">+8.2%</span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-16 | Entry: ₹1772.90 | Exit: ₹1917.7 on 2026-06-22
+    <br>🎯 Target 2 reached at ₹1917.7 (T2 was ₹1911.16). P&L: +8.2%. Full target achieved — book profits and move on.
+  </div>
+</div>
+<div class="pick-card" style="border-left-color: #f87171; opacity: 0.7;">
+  <div class="pick-header">
+    <span class="pick-sym">HINDALCO <span class="tag tag-red">COMPLETED_SL</span></span>
+    <span class="pick-pnl red">-5.6%</span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-22 00:00:00 | Entry: ₹1010.00 | Exit: ₹953.2 on 2026-06-25
+    <br>⛔ Stop loss breached — closed at ₹953.2 below SL ₹970.0. Trend: WEAK, Momentum: WEAK. Exit to preserve capital. Do not average down.
+  </div>
+</div></div></div><div class="completed-section"><h2>Expired / Invalidated</h2><div class="completed-grid">
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">NMDC <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-19 | Entry level: ₹88.42 (never triggered)
+    <br>Setup invalidated — price fell to ₹85.26 below SL (₹87.09) before entry was confirmed. No position taken.
+  </div>
+</div>
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">IFCI <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-19 | Entry level: ₹85.73 (never triggered)
+    <br>Setup invalidated — price fell to ₹77.0 below SL (₹77.56) before entry was confirmed. No position taken.
+  </div>
+</div>
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">NMDC <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-22 00:00:00 | Entry level: ₹88.42 (never triggered)
+    <br>Setup invalidated — price fell to ₹85.26 below SL (₹87.09) before entry was confirmed. No position taken.
+  </div>
+</div>
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">IFCI <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-22 00:00:00 | Entry level: ₹85.73 (never triggered)
+    <br>Setup invalidated — price fell to ₹77.0 below SL (₹77.56) before entry was confirmed. No position taken.
+  </div>
+</div>
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">NMDC <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-22 00:00:00 | Entry level: ₹88.42 (never triggered)
+    <br>Setup invalidated — price fell to ₹85.7 below SL (₹87.09) before entry was confirmed. No position taken.
+  </div>
+</div>
+<div class="pick-card action-expired">
+  <div class="pick-header">
+    <span class="pick-sym">NMDC <span class="tag" style="background:#333;color:#888">INVALIDATED</span></span>
+  </div>
+  <div style="font-size:12px;color:#777;">
+    Picked: 2026-06-22 00:00:00 | Entry level: ₹88.42 (never triggered)
+    <br>Setup invalidated — price fell to ₹84.94 below SL (₹87.09) before entry was confirmed. No position taken.
+  </div>
+</div></div></div></div></div>
+<script>
+var ACTIVE_PICKS = [{"symbol": "HBLENGINE", "entry": 799.65, "close": 827.25, "pnl_pct": 3.45, "pick_date": "2026-06-16"}, {"symbol": "PETRONET", "entry": 290.55, "close": 282.25, "pnl_pct": -2.86, "pick_date": "2026-06-16"}, {"symbol": "PNBHOUSING", "entry": 1017.9, "close": 1044.8, "pnl_pct": 2.64, "pick_date": "2026-06-16"}, {"symbol": "ANURAS", "entry": 1261.4, "close": 1275.1, "pnl_pct": 1.09, "pick_date": "2026-06-16"}, {"symbol": "HUDCO", "entry": 212.83, "close": 208.27, "pnl_pct": -2.14, "pick_date": "2026-06-16"}, {"symbol": "RADICO", "entry": 3578.7, "close": 3829.8, "pnl_pct": 7.02, "pick_date": "2026-06-16"}, {"symbol": "JUBLINGREA", "entry": 650.0, "close": 621.65, "pnl_pct": -4.36, "pick_date": "2026-06-16"}, {"symbol": "MSUMI", "entry": 38.03, "close": 41.26, "pnl_pct": 8.49, "pick_date": "2026-06-22"}, {"symbol": "LTF", "entry": 286.5, "close": 299.0, "pnl_pct": 4.36, "pick_date": "2026-06-22"}, {"symbol": "JBMA", "entry": 727.3, "close": 693.1, "pnl_pct": -4.7, "pick_date": "2026-06-22"}, {"symbol": "HBLENGINE", "entry": 815.5, "close": 827.25, "pnl_pct": 1.44, "pick_date": "2026-06-22"}, {"symbol": "PHOENIXLTD", "entry": 1881.1, "close": 1904.6, "pnl_pct": 1.25, "pick_date": "2026-06-22"}, {"symbol": "AAVAS", "entry": 1471.9, "close": 1489.9, "pnl_pct": 1.22, "pick_date": "2026-06-22"}, {"symbol": "MSUMI", "entry": 38.03, "close": 41.26, "pnl_pct": 8.49, "pick_date": "2026-06-22"}, {"symbol": "LTF", "entry": 286.5, "close": 299.0, "pnl_pct": 4.36, "pick_date": "2026-06-22"}, {"symbol": "JBMA", "entry": 727.3, "close": 693.1, "pnl_pct": -4.7, "pick_date": "2026-06-22"}, {"symbol": "HBLENGINE", "entry": 815.5, "close": 827.25, "pnl_pct": 1.44, "pick_date": "2026-06-22"}, {"symbol": "PHOENIXLTD", "entry": 1881.1, "close": 1904.6, "pnl_pct": 1.25, "pick_date": "2026-06-22"}, {"symbol": "AAVAS", "entry": 1471.9, "close": 1489.9, "pnl_pct": 1.22, "pick_date": "2026-06-22"}];
+var INVEST = 10000;
+
+function updateSidebar(dateFilter) {
+  var picks = ACTIVE_PICKS;
+  if (dateFilter && dateFilter !== 'all') {
+    picks = picks.filter(function(p) { return p.pick_date === dateFilter; });
+  }
+
+  var count = picks.length;
+  var invested = count * INVEST;
+  var currentVal = 0;
+  var best = null;
+  var worst = null;
+
+  picks.forEach(function(p) {
+    var units = INVEST / p.entry;
+    currentVal += units * p.close;
+    if (!best || p.pnl_pct > best.pnl_pct) best = p;
+    if (!worst || p.pnl_pct < worst.pnl_pct) worst = p;
+  });
+
+  var pnlAbs = currentVal - invested;
+  var pnlPct = invested > 0 ? (pnlAbs / invested * 100) : 0;
+
+  var pnlColor = pnlPct >= 0 ? '#34d399' : '#f87171';
+
+  document.getElementById('sb-count').textContent = count;
+  document.getElementById('sb-invested').textContent = '₹' + invested.toLocaleString('en-IN');
+  document.getElementById('sb-current').textContent = '₹' + Math.round(currentVal).toLocaleString('en-IN');
+
+  var pnlEl = document.getElementById('sb-pnl-abs');
+  pnlEl.textContent = (pnlAbs >= 0 ? '+₹' : '-₹') + Math.abs(Math.round(pnlAbs)).toLocaleString('en-IN');
+  pnlEl.style.color = pnlColor;
+
+  var pctEl = document.getElementById('sb-pnl-pct');
+  pctEl.textContent = (pnlPct >= 0 ? '+' : '') + pnlPct.toFixed(1) + '%';
+  pctEl.style.color = pnlColor;
+
+  document.getElementById('sb-best').textContent = best ? best.symbol + ' ' + best.pnl_pct.toFixed(1) + '%' : '—';
+  document.getElementById('sb-worst').textContent = worst ? worst.symbol + ' ' + worst.pnl_pct.toFixed(1) + '%' : '—';
+
+  // Leaderboard — show date tag only for duplicate symbols
+  var sorted = picks.slice().sort(function(a,b) { return b.pnl_pct - a.pnl_pct; });
+  // Count symbol occurrences to decide whether to show date
+  var symCounts = {};
+  sorted.forEach(function(p) { symCounts[p.symbol] = (symCounts[p.symbol] || 0) + 1; });
+  var lbHtml = '';
+  sorted.forEach(function(p, i) {
+    var c = p.pnl_pct >= 0 ? '#34d399' : '#f87171';
+    var dateTag = symCounts[p.symbol] > 1 ? ' <span style="color:#666;font-size:10px">(' + p.pick_date.slice(5) + ')</span>' : '';
+    lbHtml += '<div class="lb-row">' +
+      '<span class="lb-rank">' + (i+1) + '</span>' +
+      '<span class="lb-sym">' + p.symbol + dateTag + '</span>' +
+      '<span class="lb-pnl" style="color:' + c + '">' + (p.pnl_pct >= 0 ? '+' : '') + p.pnl_pct.toFixed(1) + '%</span>' +
+      '</div>';
+  });
+  document.getElementById('sb-leaderboard').innerHTML = lbHtml || '<div style="color:#666;font-size:12px">No active picks for this filter</div>';
+}
+
+function updateSummaryStats() {
+  var cards = document.querySelectorAll('.pick-card[data-status]');
+  var pending = 0, active = 0, inProfit = 0, inLoss = 0, t1Hits = 0;
+  var pnls = [];
+
+  cards.forEach(function(card) {
+    if (card.classList.contains('hidden')) return;
+    var status = card.getAttribute('data-status');
+    var pnl    = parseFloat(card.getAttribute('data-pnl') || '0');
+    var t1     = card.getAttribute('data-t1-hit') === 'true';
+
+    if (status === 'PENDING') {
+      pending++;
+    } else if (status === 'ACTIVE') {
+      active++;
+      if (pnl > 0) inProfit++;
+      if (pnl < 0) inLoss++;
+      if (t1) t1Hits++;
+      pnls.push(pnl);
+    }
+  });
+
+  var avgPnl = pnls.length > 0 ? pnls.reduce(function(a, b) { return a + b; }, 0) / pnls.length : 0;
+
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-active').textContent  = active;
+  document.getElementById('stat-profit').textContent  = inProfit;
+  document.getElementById('stat-loss').textContent    = inLoss;
+  document.getElementById('stat-t1').textContent      = t1Hits;
+  var avgEl = document.getElementById('stat-avgpnl');
+  avgEl.textContent  = (avgPnl >= 0 ? '+' : '') + avgPnl.toFixed(1) + '%';
+  avgEl.style.color  = avgPnl >= 0 ? '#34d399' : '#f87171';
+}
+
+function filterPicks(dateVal) {
+  var cards = document.querySelectorAll('.pick-card[data-pick-date]');
+  var btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  cards.forEach(function(card) {
+    if (dateVal === 'all' || card.getAttribute('data-pick-date') === dateVal) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  updateSidebar(dateVal);
+  updateSummaryStats();
+}
+
+// Initialize on page load
+updateSidebar('all');
+updateSummaryStats();
+</script>
+</div>
+</body>
+</html>

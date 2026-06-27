@@ -558,6 +558,223 @@ def append_to_excel(summary: dict):
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HTML DASHBOARD — viewable directly on GitHub without downloading
+# ─────────────────────────────────────────────────────────────────────────────
+
+DASHBOARD_FILE = "dashboard.html"
+
+def generate_dashboard(wl: dict, summary: dict = None):
+    """
+    Generate a self-contained HTML dashboard viewable on GitHub.
+    Shows all picks grouped by state with colour coding, price history
+    sparkline data, and key trade levels.
+    """
+    from datetime import datetime as _dt
+
+    picks   = wl.get("picks", {})
+    updated = wl.get("last_updated", "—")
+    now_ist = _dt.now(IST).strftime("%d-%b-%Y %H:%M IST")
+
+    # Counters
+    n_watching  = sum(1 for p in picks.values() if p["state"] == ST_WATCHING)
+    n_breakout  = sum(1 for p in picks.values() if p["state"] == ST_BREAKOUT)
+    n_breakdown = sum(1 for p in picks.values() if p["state"] == ST_BREAKDOWN)
+    n_expired   = sum(1 for p in picks.values() if p["state"] == ST_EXPIRED)
+
+    def state_badge(state):
+        cfg = {
+            ST_BREAKOUT:  ("🟢", "#1a7f37", "#d4edda"),
+            ST_BREAKDOWN: ("🔴", "#842029", "#f8d7da"),
+            ST_EXPIRED:   ("⚫", "#6c757d", "#e9ecef"),
+            ST_WATCHING:  ("👁",  "#0c4a6e", "#dbeafe"),
+        }.get(state, ("", "#000", "#fff"))
+        return (f'<span style="background:{cfg[2]};color:{cfg[1]};'
+                f'padding:2px 10px;border-radius:12px;font-size:12px;'
+                f'font-weight:600">{cfg[0]} {state}</span>')
+
+    def expiry_badge(exp_date):
+        if not exp_date:
+            return ""
+        try:
+            exp_dt = pd.to_datetime(exp_date)
+            today  = pd.Timestamp(_last_trading_day())
+            days   = (exp_dt - today).days
+            if days < 0:
+                return (f'<span style="background:#f8d7da;color:#842029;'
+                        f'padding:1px 8px;border-radius:10px;font-size:11px">'
+                        f'EXPIRED {abs(days)}d ago</span>')
+            elif days <= 1:
+                return (f'<span style="background:#fff3cd;color:#856404;'
+                        f'padding:1px 8px;border-radius:10px;font-size:11px">'
+                        f'⚠ {days}d left</span>')
+            else:
+                return (f'<span style="background:#e2e8f0;color:#475569;'
+                        f'padding:1px 8px;border-radius:10px;font-size:11px">'
+                        f'exp {exp_date}</span>')
+        except Exception:
+            return exp_date
+
+    def gap_bar(gap_pct):
+        if gap_pct is None:
+            return ""
+        pct = min(max(float(gap_pct), 0), 20)
+        width = int((1 - pct/20) * 80)
+        color = "#22c55e" if pct < 2 else ("#f59e0b" if pct < 5 else "#94a3b8")
+        return (f'<div style="display:flex;align-items:center;gap:6px">'
+                f'<div style="width:80px;background:#e2e8f0;border-radius:4px;height:8px">'
+                f'<div style="width:{width}px;background:{color};border-radius:4px;height:8px"></div></div>'
+                f'<span style="font-size:12px;color:#64748b">{gap_pct:.1f}%</span></div>')
+
+    def price_history_mini(history):
+        if not history or len(history) < 2:
+            return "<span style='color:#94a3b8;font-size:11px'>—</span>"
+        closes = [h["close"] for h in history[-10:]]
+        mn, mx = min(closes), max(closes)
+        rng    = mx - mn if mx > mn else 1
+        pts    = []
+        W, H   = 80, 24
+        for i, c in enumerate(closes):
+            x = int(i / (len(closes)-1) * W)
+            y = H - int((c - mn) / rng * H)
+            pts.append(f"{x},{y}")
+        color = "#22c55e" if closes[-1] >= closes[0] else "#ef4444"
+        return (f'<svg width="{W}" height="{H}" style="overflow:visible">'
+                f'<polyline points="{" ".join(pts)}" fill="none" stroke="{color}" stroke-width="1.5"/>'
+                f'</svg>')
+
+    # ── Sort picks: alerts first ──────────────────────────────────────────────
+    order = {ST_BREAKOUT: 0, ST_BREAKDOWN: 1, ST_EXPIRED: 3, ST_WATCHING: 2}
+    sorted_picks = sorted(picks.values(),
+                          key=lambda p: (order.get(p["state"], 9), -p.get("score", 0)))
+
+    # ── Build rows ────────────────────────────────────────────────────────────
+    rows_html = ""
+    for p in sorted_picks:
+        h        = p.get("price_history", [])
+        last_h   = h[-1] if h else {}
+        close    = last_h.get("close",  "—")
+        vol      = last_h.get("volume", "—")
+        gap      = last_h.get("gap_pct", p.get("gap_to_break_pct", None))
+        days     = len(h)
+        state    = p["state"]
+
+        row_bg = {
+            ST_BREAKOUT:  "#f0fdf4",
+            ST_BREAKDOWN: "#fff1f2",
+            ST_EXPIRED:   "#f8fafc",
+            ST_WATCHING:  "#ffffff",
+        }.get(state, "#ffffff")
+
+        close_str  = f"₹{close:,.2f}"  if isinstance(close, (int,float)) else "—"
+        vol_str    = f"{vol:,.0f}"     if isinstance(vol,   (int,float)) else "—"
+        brk_str    = f"₹{p['breakout_level']:,.2f}"
+        stop_str   = f"₹{p['stop_loss']:,.2f}"
+        tgt_str    = f"₹{p['target_1']:,.2f}"
+        rr_str     = f"{p.get('risk_reward',0):.1f}x"
+        pole_str   = f"+{p.get('pole_return_pct',0):.1f}%"
+        conf_color = {"HIGH":"#166534","MEDIUM":"#92400e","LOW":"#6b7280"}.get(p.get("confidence",""),"#000")
+
+        rows_html += f"""
+        <tr style="background:{row_bg};border-bottom:1px solid #e2e8f0">
+          <td style="padding:10px 12px;font-weight:600;font-size:13px">
+            {p["symbol"].replace(".NS","")}
+          </td>
+          <td style="padding:10px 8px;font-size:12px;color:#475569">{p["pattern"]}</td>
+          <td style="padding:10px 8px">{state_badge(state)}</td>
+          <td style="padding:10px 8px;font-size:12px;font-weight:600;color:{conf_color}">{p.get("confidence","—")}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:right">{close_str}</td>
+          <td style="padding:10px 8px">{gap_bar(gap)}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:right;font-weight:600;color:#1d4ed8">{brk_str}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:right;color:#dc2626">{stop_str}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:right;color:#16a34a">{tgt_str}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:center">{rr_str}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:center">{pole_str}</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:center;color:#475569">{days}d</td>
+          <td style="padding:10px 8px;font-size:12px;text-align:right;color:#475569">{vol_str}</td>
+          <td style="padding:10px 8px">{expiry_badge(p.get("expiry_date"))}</td>
+          <td style="padding:10px 8px">{price_history_mini(h)}</td>
+          <td style="padding:10px 8px;font-size:11px;color:#64748b;max-width:220px;word-wrap:break-word">
+            {(p.get("resolved_note","") or "")[:120]}
+          </td>
+        </tr>"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MaverickPICKS Tracker Dashboard</title>
+<style>
+  * {{ box-sizing:border-box; margin:0; padding:0 }}
+  body {{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+          background:#f8fafc; color:#1e293b; }}
+  .header {{ background:linear-gradient(135deg,#1e3a5f,#1d4ed8);
+             color:white; padding:24px 32px; }}
+  .header h1 {{ font-size:22px; font-weight:700; letter-spacing:-.3px }}
+  .header p  {{ font-size:13px; opacity:.8; margin-top:4px }}
+  .stats {{ display:flex; gap:16px; padding:20px 32px; flex-wrap:wrap }}
+  .stat {{ background:white; border:1px solid #e2e8f0; border-radius:10px;
+           padding:14px 20px; min-width:120px; box-shadow:0 1px 3px rgba(0,0,0,.06) }}
+  .stat .n {{ font-size:28px; font-weight:700 }}
+  .stat .l {{ font-size:12px; color:#64748b; margin-top:2px }}
+  .stat.green {{ border-left:4px solid #22c55e }}
+  .stat.red   {{ border-left:4px solid #ef4444 }}
+  .stat.blue  {{ border-left:4px solid #3b82f6 }}
+  .stat.grey  {{ border-left:4px solid #94a3b8 }}
+  .table-wrap {{ padding:0 32px 32px; overflow-x:auto }}
+  table {{ width:100%; border-collapse:collapse; background:white;
+           border-radius:12px; overflow:hidden;
+           box-shadow:0 1px 3px rgba(0,0,0,.08) }}
+  thead tr {{ background:#1e3a5f; color:white }}
+  thead th {{ padding:10px 12px; font-size:11px; font-weight:600;
+              text-transform:uppercase; letter-spacing:.05em; white-space:nowrap }}
+  tbody tr:hover {{ background:#f0f9ff!important }}
+  .note {{ font-size:11px; color:#64748b; padding:8px 32px 16px }}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>MaverickPICKS — Pattern Tracker Dashboard</h1>
+  <p>Last updated: {now_ist} &nbsp;|&nbsp; Data anchor: {wl.get("last_updated","—")}</p>
+</div>
+
+<div class="stats">
+  <div class="stat green"><div class="n">{n_breakout}</div><div class="l">🟢 Breakouts</div></div>
+  <div class="stat red">  <div class="n">{n_breakdown}</div><div class="l">🔴 Breakdowns</div></div>
+  <div class="stat blue"> <div class="n">{n_watching}</div><div class="l">👁 Watching</div></div>
+  <div class="stat grey"> <div class="n">{n_expired}</div><div class="l">⚫ Expired</div></div>
+</div>
+
+<div class="table-wrap">
+{"<p style='padding:40px;text-align:center;color:#94a3b8;font-size:14px'>No picks in watchlist yet. Run the scanner on a trading day to populate this dashboard.</p>" if not sorted_picks else f"""
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th><th>Pattern</th><th>State</th><th>Conf</th>
+      <th>Last Close</th><th>Gap to Break</th><th>Breakout ₹</th>
+      <th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th>Pole</th>
+      <th>Days</th><th>Volume</th><th>Expiry</th><th>Trend</th><th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>"""}
+</div>
+<p class="note">
+  ⓘ Gap to Break = how far today's close is from the breakout level (green &lt;2%, amber &lt;5%, grey &gt;5%).
+  Trend = last 10-day price sparkline. Breakouts shown in green rows, breakdowns in red.
+  Refresh this page after each daily run to see updated data.
+</p>
+</body>
+</html>"""
+
+    with open(DASHBOARD_FILE, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"  Dashboard generated → {DASHBOARD_FILE}")
+
 def main():
     ap = argparse.ArgumentParser(
         description="MaverickPICKS Pattern Tracker — daily watchlist monitor"
@@ -583,6 +800,7 @@ def main():
                      if p["state"] == ST_WATCHING])
         print(f"  Added: {added}  |  Skipped (already watching): {skipped}")
         print(f"  Total WATCHING: {total}")
+        generate_dashboard(wl)
 
     # ── Status only ───────────────────────────────────────────────────────────
     if args.status:
@@ -601,6 +819,7 @@ def main():
                       f"day:{len(h):>2}  "
                       f"brk:₹{p['breakout_level']:.2f}  "
                       f"exp:{p.get('expiry_date','—')}")
+        generate_dashboard(wl)
         return
 
     # ── Check ─────────────────────────────────────────────────────────────────
@@ -608,6 +827,8 @@ def main():
         summary = check_watchlist()
         print_report(summary)
         append_to_excel(summary)
+        wl = load_watchlist()
+        generate_dashboard(wl, summary)
 
     if not args.import_csv and not args.check and not args.status:
         ap.print_help()

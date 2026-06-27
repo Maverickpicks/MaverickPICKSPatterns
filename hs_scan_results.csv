@@ -1,0 +1,126 @@
+Symbol,Pattern Type,Status,Left Shoulder Date,Left Shoulder Price,Head Date,Head Price,Right Shoulder Date,Right Shoulder Price,Neckline Price,Breakout Date,Breakout Price,Volume Confirmed,Target,Stop Loss,Risk:Reward,Notes
+3MINDIA,Inverse H&S,Forming,2025-12-29,34100.0,2026-01-27,32750.0,2026-02-16,33985.0,37667.5,,,No,,,,Neckline not yet broken
+ACC,Inverse H&S,Forming,2025-04-07,1855.78,2025-05-09,1761.65,2025-06-04,1842.26,2026.45,,,No,,,,Neckline not yet broken
+ABBOTINDIA,Inverse H&S,Failed,2025-03-12,29149.57,2025-04-07,27122.3,2025-04-25,29025.74,30953.89,2025-05-21,31003.2,Yes,34834.79,29025.74,1.94,Closed beyond right-shoulder level after breakout
+ACUTAAS,H&S,Forming,2025-01-08,1196.28,2025-02-05,1320.66,2025-02-21,1173.31,978.39,,,No,,,,Neckline not yet broken
+ADANIENSOL,Inverse H&S,Forming,2025-12-18,969.0,2026-01-23,803.1,2026-02-16,972.3,1053.85,2026-04-08,1073.3,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+ADANIGREEN,Inverse H&S,Failed,2025-06-04,983.7,2025-06-19,929.0,2025-07-08,981.3,1061.95,2025-09-22,1152.15,Yes,1285.1,981.3,0.78,Closed beyond right-shoulder level after breakout
+ADANIPOWER,Inverse H&S,Forming,2025-12-30,139.68,2026-01-23,128.1,2026-02-16,139.01,155.03,2026-03-17,155.6,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+AEGISLOG,H&S,Forming,2025-09-16,819.4,2025-10-03,944.6,2025-10-28,821.75,764.45,2025-10-31,750.15,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+AEGISVOPAK,H&S,Forming,2025-06-26,263.5,2025-07-18,302.0,2025-08-05,258.74,230.34,2026-01-09,228.97,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+AFCONS,Inverse H&S,Forming,2026-04-24,311.45,2026-05-19,289.8,2026-06-08,309.15,350.77,,,No,,,,Neckline not yet broken
+AFFLE,H&S,Forming,2025-08-13,2010.0,2025-09-22,2185.9,2025-10-10,1993.7,1875.45,2025-11-04,1832.8,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+AFFLE,H&S,Forming,2026-04-17,1519.8,2026-05-11,1686.0,2026-05-26,1544.0,1402.7,,,No,,,,Neckline not yet broken
+ARE&M,H&S,Confirmed,2025-08-20,1004.34,2025-09-16,1051.92,2025-10-09,1009.91,959.12,2025-11-10,958.6,Yes,865.8,1009.91,1.81,
+ANANTRAJ,Inverse H&S,Failed,2025-03-03,418.25,2025-04-07,375.7,2025-05-09,413.55,540.87,2025-05-29,544.19,Yes,709.37,413.55,1.26,Closed beyond right-shoulder level after breakout
+ANANTRAJ,Inverse H&S,Forming,2025-12-30,524.0,2026-01-30,478.0,2026-02-16,525.0,597.7,,,No,,,,Neckline not yet broken
+APARINDS,Inverse H&S,Forming,2026-02-13,9325.5,2026-03-16,8856.0,2026-04-02,9298.5,11223.0,2026-04-10,11342.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+APTUS,Inverse H&S,Forming,2025-07-16,327.28,2025-07-31,314.88,2025-08-11,326.0,348.64,2025-08-14,350.31,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+DMART,H&S,Forming,2025-04-03,4195.5,2025-04-24,4557.7,2025-05-19,4247.7,3805.6,2025-12-18,3757.2,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BSE,Inverse H&S,Forming,2025-02-17,1651.79,2025-03-11,1223.47,2025-04-07,1654.23,1966.24,2025-04-15,1979.76,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BAJAJHLDNG,Inverse H&S,Failed,2025-03-04,11005.84,2025-04-07,10327.92,2025-05-09,11073.71,12701.83,2025-05-16,13020.13,Yes,15394.04,11073.71,1.22,Closed beyond right-shoulder level after breakout
+BALRAMCHIN,H&S,Forming,2025-04-03,567.2,2025-04-25,600.7,2025-05-19,568.94,508.6,2025-09-19,505.92,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BANDHANBNK,Inverse H&S,Forming,2025-09-01,159.53,2025-09-26,154.53,2025-10-17,159.41,169.49,2025-10-23,171.31,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BAYERCROP,H&S,Forming,2025-12-29,4619.0,2026-02-12,4966.8,2026-03-11,4639.7,4352.55,2026-05-15,4349.8,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BDL,H&S,Forming,2025-10-17,1564.43,2025-11-14,1627.61,2025-12-02,1554.47,1431.45,2025-12-08,1418.05,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BEL,Inverse H&S,Forming,2026-02-24,428.53,2026-03-30,399.35,2026-04-30,424.5,468.93,,,No,,,,Neckline not yet broken
+BEL,H&S,Failed,2025-05-28,390.93,2025-07-01,433.15,2025-08-06,390.92,375.38,2025-08-20,370.27,Yes,312.5,390.92,2.8,Closed beyond right-shoulder level after breakout
+BSOFT,Inverse H&S,Forming,2025-03-13,378.59,2025-04-07,325.87,2025-05-09,370.46,406.0,2025-05-12,413.93,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BSOFT,H&S,Forming,2025-06-11,429.04,2025-06-27,444.99,2025-07-18,430.66,403.1,2025-07-22,401.75,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BLUEDART,H&S,Forming,2025-04-23,6650.18,2025-05-26,7193.83,2025-06-10,6581.98,6186.19,2025-06-19,6135.41,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BBTC,H&S,Forming,2026-04-23,1559.7,2026-05-08,1610.8,2026-05-25,1552.0,1467.55,,,No,,,,Neckline not yet broken
+BOSCHLTD,Inverse H&S,Forming,2026-02-20,34730.0,2026-03-30,28610.0,2026-05-04,35475.0,37925.0,2026-05-08,38145.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+BRIGADE,H&S,Forming,2025-05-19,843.45,2025-06-05,996.44,2025-07-08,841.58,789.74,2025-07-23,785.03,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+CESC,Inverse H&S,Forming,2025-08-11,155.01,2025-08-29,147.07,2025-10-01,155.08,166.32,2025-10-15,170.47,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+CANFINHOME,Inverse H&S,Confirmed,2025-08-08,726.6,2025-08-29,703.23,2025-09-12,727.44,776.49,2025-10-01,777.02,Yes,850.28,727.44,1.48,
+CARTRADE,H&S,Forming,2025-04-04,1724.0,2025-05-05,1868.5,2025-05-16,1714.0,1431.85,,,No,,,,Neckline not yet broken
+CASTROLIND,H&S,Forming,2025-02-10,197.73,2025-03-06,231.17,2025-04-24,201.86,178.03,2025-12-16,177.54,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+CDSL,H&S,Forming,2026-03-11,1261.7,2026-04-20,1401.1,2026-05-29,1269.3,1134.5,,,No,,,,Neckline not yet broken
+COHANCE,Inverse H&S,Forming,2025-01-13,1039.1,2025-01-28,935.0,2025-02-12,1025.0,1135.35,2025-02-19,1159.95,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+CAMS,H&S,Forming,2025-08-25,777.98,2025-09-19,822.21,2025-10-14,778.0,729.73,2025-12-30,728.18,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+CREDITACC,Inverse H&S,Failed,2025-08-29,1323.1,2025-09-15,1265.0,2025-10-01,1326.0,1427.5,2025-10-27,1472.2,Yes,1634.7,1326.0,1.11,Closed beyond right-shoulder level after breakout
+CROMPTON,Inverse H&S,Forming,2025-03-03,313.36,2025-04-07,298.34,2025-05-09,312.22,358.31,,,No,,,,Neckline not yet broken
+CUMMINSIND,Inverse H&S,Forming,2025-03-12,2742.54,2025-04-07,2544.32,2025-04-25,2759.4,2986.91,2025-05-16,2993.62,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+DEEPAKFERT,H&S,Forming,2025-06-12,1625.36,2025-07-03,1765.95,2025-07-15,1646.51,1517.73,2025-07-28,1509.59,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+ERIS,H&S,Forming,2026-02-25,1416.4,2026-04-16,1470.11,2026-05-11,1411.92,1211.5,,,No,,,,Neckline not yet broken
+NYKAA,H&S,Forming,2026-01-05,272.95,2026-02-11,285.6,2026-04-20,272.5,232.03,,,No,,,,Neckline not yet broken
+MEDANTA,Inverse H&S,Forming,2025-03-12,1156.08,2025-04-07,1009.64,2025-04-30,1171.08,1287.89,2025-07-10,1301.33,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+GODREJIND,Inverse H&S,Forming,2026-02-13,956.35,2026-03-30,744.2,2026-05-04,949.05,1053.2,2026-05-07,1226.85,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+GODREJIND,H&S,Failed,2025-02-21,1194.0,2025-03-24,1265.0,2025-04-22,1190.0,1011.0,2025-12-04,1000.8,Yes,746.8,1190.0,1.34,Closed beyond right-shoulder level after breakout
+GRAPHITE,Inverse H&S,Confirmed,2025-10-14,546.1,2025-11-10,519.5,2025-11-24,542.5,629.55,2025-12-31,641.7,Yes,751.75,542.5,1.11,
+GESHIP,H&S,Forming,2025-10-31,1114.69,2025-11-12,1155.15,2025-12-01,1117.12,1028.08,,,No,,,,Neckline not yet broken
+HEG,H&S,Forming,2025-10-09,551.2,2025-11-03,606.55,2025-11-26,550.0,497.53,2026-03-13,496.05,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+HEG,H&S,Forming,2025-12-11,558.0,2025-12-31,672.0,2026-01-29,575.0,528.0,2026-02-02,526.95,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+HAVELLS,H&S,Confirmed,2025-12-22,1435.93,2026-01-09,1502.59,2026-02-18,1435.15,1318.83,2026-03-04,1312.16,Yes,1128.4,1435.15,1.49,
+HSCL,Inverse H&S,Forming,2025-02-18,396.11,2025-03-03,383.59,2025-03-13,397.86,451.96,2025-03-24,456.85,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+HAL,H&S,Forming,2026-04-22,4413.0,2026-05-08,4836.3,2026-05-27,4474.0,4205.55,2026-06-04,4191.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+HONAUT,H&S,Forming,2025-06-06,39635.52,2025-07-03,41450.0,2025-08-29,39330.0,36315.0,2025-09-04,36110.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+IRB,H&S,Forming,2026-01-08,21.59,2026-02-10,22.38,2026-03-12,21.44,19.16,,,No,,,,Neckline not yet broken
+INDIAMART,Inverse H&S,Forming,2026-03-05,1973.02,2026-03-30,1871.55,2026-05-04,1957.37,2146.03,,,No,,,,Neckline not yet broken
+INDIANB,H&S,Forming,2025-01-20,511.5,2025-01-31,535.89,2025-02-21,510.78,469.15,2025-03-13,468.2,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+IOB,H&S,Forming,2025-05-19,40.78,2025-06-03,42.8,2025-07-02,40.71,36.52,2025-08-06,36.4,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+INTELLECT,H&S,Forming,2025-08-25,1007.2,2025-09-22,1104.0,2025-10-10,1021.45,916.15,2026-01-12,913.65,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+IGIL,Inverse H&S,Forming,2026-03-04,310.5,2026-03-16,296.05,2026-03-30,312.0,342.07,2026-04-15,351.1,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JBCHEPHARM,Inverse H&S,Forming,2025-06-20,1638.95,2025-07-11,1580.03,2025-08-07,1629.91,1803.49,2025-11-11,1808.66,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JKCEMENT,Inverse H&S,Forming,2026-01-12,5526.5,2026-01-27,5290.0,2026-02-16,5523.5,6046.75,,,No,,,,Neckline not yet broken
+JSWENERGY,Inverse H&S,Forming,2025-12-30,466.41,2026-01-27,426.3,2026-03-04,462.93,513.43,2026-03-12,516.54,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JSWSTEEL,Inverse H&S,Forming,2025-02-28,938.02,2025-04-07,902.77,2025-05-09,932.49,1065.38,2025-08-18,1079.8,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JPPOWER,H&S,Forming,2025-04-03,15.35,2025-04-22,16.49,2025-05-19,15.52,12.89,,,No,,,,Neckline not yet broken
+JPPOWER,H&S,Forming,2025-06-11,19.3,2025-07-14,27.7,2025-08-21,19.84,17.58,2025-09-29,17.53,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JINDALSTEL,Inverse H&S,Confirmed,2025-02-28,840.73,2025-04-09,768.48,2025-05-09,831.95,933.02,2025-05-14,941.33,Yes,1105.88,831.95,1.5,
+JINDALSTEL,Inverse H&S,Confirmed,2025-06-02,928.96,2025-06-19,880.9,2025-07-09,924.92,982.75,2025-07-24,998.47,Yes,1100.32,924.92,1.38,
+JUBLPHARMA,Inverse H&S,Failed,2025-01-17,896.17,2025-01-28,838.67,2025-02-14,902.0,1032.61,2025-05-22,1064.6,Yes,1258.55,902.0,1.19,Closed beyond right-shoulder level after breakout
+JWL,Inverse H&S,Failed,2025-02-18,289.38,2025-03-03,269.38,2025-03-17,286.29,326.57,2025-03-21,347.04,Yes,404.23,286.29,0.94,Closed beyond right-shoulder level after breakout
+JYOTICNC,Inverse H&S,Forming,2025-01-28,904.15,2025-02-28,750.1,2025-04-07,890.0,1162.0,2025-05-05,1165.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+JYOTICNC,Inverse H&S,Forming,2025-10-15,893.8,2025-11-03,856.1,2025-12-08,900.1,999.05,,,No,,,,Neckline not yet broken
+KAJARIACER,Inverse H&S,Forming,2025-09-02,1189.8,2025-09-29,1143.69,2025-10-24,1197.8,1271.0,,,No,,,,Neckline not yet broken
+LTF,Inverse H&S,Forming,2026-02-16,278.33,2026-04-02,232.51,2026-04-30,274.55,302.55,,,No,,,,Neckline not yet broken
+LICHSGFIN,Inverse H&S,Failed,2025-04-25,576.2,2025-05-09,553.26,2025-05-22,573.4,619.54,2025-07-16,626.03,Yes,692.31,573.4,1.26,Closed beyond right-shoulder level after breakout
+LTFOODS,Inverse H&S,Forming,2025-03-13,327.73,2025-04-07,286.27,2025-05-07,327.73,382.82,2025-05-21,395.41,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+LTM,H&S,Forming,2026-03-20,4331.35,2026-04-21,4720.74,2026-05-11,4345.76,4036.9,2026-05-13,4032.36,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+LT,H&S,Forming,2026-01-05,4154.42,2026-02-24,4397.05,2026-04-16,4108.87,3470.21,,,No,,,,Neckline not yet broken
+THELEELA,H&S,Forming,2026-01-05,452.95,2026-01-16,471.0,2026-02-11,453.75,405.62,2026-03-20,399.3,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+LINDEINDIA,Inverse H&S,Failed,2025-03-03,5719.36,2025-04-04,5232.67,2025-05-09,5789.23,6617.69,2025-05-14,6821.31,Yes,8206.34,5789.23,1.34,Closed beyond right-shoulder level after breakout
+MGL,Inverse H&S,Forming,2026-02-16,1098.6,2026-03-23,900.0,2026-04-30,1116.95,1205.3,2026-06-17,1208.9,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+MANAPPURAM,Inverse H&S,Forming,2025-09-29,273.3,2025-10-31,261.56,2025-11-24,273.35,289.7,2025-12-19,291.69,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+MARICO,H&S,Forming,2025-10-20,742.0,2025-11-18,765.3,2025-12-08,739.5,706.52,,,No,,,,Neckline not yet broken
+MINDACORP,Inverse H&S,Failed,2025-07-14,499.57,2025-08-11,443.78,2025-08-28,494.5,530.96,2025-09-17,531.21,Yes,618.39,494.5,2.37,Closed beyond right-shoulder level after breakout
+NLCINDIA,Inverse H&S,Confirmed,2026-02-13,249.15,2026-03-09,236.0,2026-03-23,250.4,273.05,2026-04-01,283.2,Yes,320.25,250.4,1.13,
+NTPCGREEN,Inverse H&S,Failed,2025-03-17,93.63,2025-04-07,88.74,2025-05-09,94.5,108.75,2025-05-22,112.18,Yes,132.19,94.5,1.13,Closed beyond right-shoulder level after breakout
+NAVA,Inverse H&S,Forming,2025-12-30,549.45,2026-01-27,520.2,2026-02-16,546.0,608.17,2026-04-13,608.5,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+NAVA,H&S,Forming,2025-12-22,587.05,2026-01-06,627.0,2026-02-09,589.35,534.83,2026-03-30,531.45,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+NAVINFLUOR,Inverse H&S,Failed,2025-11-28,5660.19,2025-12-09,5433.46,2025-12-29,5704.64,6051.72,2025-12-30,6129.13,Yes,6747.38,5704.64,1.46,Closed beyond right-shoulder level after breakout
+NETWEB,Inverse H&S,Confirmed,2025-03-17,1393.31,2025-04-07,1250.04,2025-05-02,1395.41,1626.45,2025-05-08,1630.32,Yes,2006.74,1395.41,1.6,
+NUVAMA,H&S,Forming,2025-06-09,1530.74,2025-06-30,1669.78,2025-07-17,1549.38,1367.95,2025-08-01,1357.35,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+OIL,H&S,Forming,2025-05-29,436.32,2025-06-16,478.42,2025-07-04,442.26,411.06,2025-08-13,396.17,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+PFC,Inverse H&S,Forming,2025-07-29,386.85,2025-08-29,365.67,2025-09-26,384.14,406.57,2026-02-04,407.32,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+PREMIERENE,Inverse H&S,Forming,2025-05-23,1020.49,2025-06-19,956.69,2025-07-07,1029.48,1098.18,2025-07-10,1114.15,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+PNB,H&S,Forming,2026-01-05,124.62,2026-01-19,131.33,2026-02-03,125.36,116.25,2026-02-13,115.4,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+RECLTD,Inverse H&S,Forming,2025-11-25,342.76,2025-12-18,323.83,2026-01-21,343.54,367.98,2026-01-28,369.38,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+RITES,H&S,Forming,2025-08-21,253.81,2025-09-17,273.74,2025-10-07,253.95,236.71,2025-11-25,234.67,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+RAILTEL,Inverse H&S,Forming,2026-02-06,321.38,2026-03-30,245.0,2026-04-24,314.51,355.63,,,No,,,,Neckline not yet broken
+RELIANCE,H&S,Forming,2026-04-20,1366.68,2026-05-05,1466.62,2026-05-25,1364.79,1305.76,2026-06-04,1297.7,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SBFC,Inverse H&S,Forming,2026-03-02,89.06,2026-03-30,79.6,2026-04-30,90.13,99.61,,,No,,,,Neckline not yet broken
+SJVN,H&S,Forming,2026-01-29,73.57,2026-02-12,80.25,2026-03-13,73.81,67.47,2026-03-23,66.52,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SCI,H&S,Forming,2026-04-17,322.8,2026-05-11,368.75,2026-06-05,324.0,284.1,,,No,,,,Neckline not yet broken
+SHRIRAMFIN,Inverse H&S,Forming,2025-08-08,604.27,2025-08-29,563.07,2025-09-29,599.5,633.89,2025-10-01,644.77,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+STARHEALTH,H&S,Forming,2025-08-18,462.0,2025-09-04,494.0,2025-09-24,460.85,432.4,2026-01-23,425.15,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SUMICHEM,H&S,Forming,2025-07-21,616.75,2025-08-04,665.0,2025-08-22,608.95,573.95,2025-08-26,570.0,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SPLPETRO,H&S,Forming,2025-09-08,798.34,2025-09-29,975.75,2025-10-21,812.3,761.54,2025-10-30,750.9,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SWANCORP,Inverse H&S,Forming,2025-03-17,391.97,2025-04-07,362.13,2025-05-09,388.67,470.98,2025-07-15,502.15,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+SWIGGY,H&S,Confirmed,2026-04-08,285.6,2026-04-24,299.0,2026-05-08,284.0,264.1,2026-05-11,263.7,Yes,228.8,284.0,1.72,
+TATACHEM,Inverse H&S,Confirmed,2026-02-16,673.89,2026-03-30,571.51,2026-04-24,679.85,738.94,2026-04-28,790.0,Yes,957.43,679.85,1.52,
+TCS,Inverse H&S,Forming,2025-03-19,3302.3,2025-04-07,2914.45,2025-05-09,3240.65,3442.68,2025-05-12,3452.65,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+TATACONSUM,Inverse H&S,Forming,2026-02-16,1107.73,2026-04-02,998.75,2026-05-07,1126.07,1181.01,2026-05-11,1260.34,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+TATAINVEST,Inverse H&S,Failed,2025-01-28,557.04,2025-02-17,509.87,2025-02-28,565.37,627.71,2025-03-07,632.72,Yes,750.56,565.37,1.75,Closed beyond right-shoulder level after breakout
+TATAINVEST,H&S,Forming,2025-07-21,691.43,2025-08-05,759.09,2025-08-21,702.43,662.53,2026-01-14,660.39,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+TMPV,Inverse H&S,Forming,2025-07-21,665.73,2025-08-11,621.94,2025-08-28,662.31,699.13,2025-09-08,713.58,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+TATAPOWER,Inverse H&S,Forming,2025-12-30,372.7,2026-01-27,342.5,2026-02-19,368.3,388.95,2026-03-12,402.15,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+TATASTEEL,H&S,Forming,2025-02-21,135.58,2025-03-20,153.29,2025-04-25,137.35,124.16,,,No,,,,Neckline not yet broken
+TARIL,Inverse H&S,Failed,2025-11-11,282.2,2025-12-11,230.1,2025-12-30,281.3,328.4,2026-01-02,336.4,Yes,434.7,281.3,1.78,Closed beyond right-shoulder level after breakout
+TRIDENT,Inverse H&S,Forming,2025-06-03,29.75,2025-06-20,28.32,2025-07-03,29.92,31.97,,,No,,,,Neckline not yet broken
+UCOBANK,H&S,Forming,2025-05-19,32.61,2025-06-02,34.5,2025-07-02,32.74,29.37,2025-07-31,29.3,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+UNITDSPR,H&S,Forming,2026-03-25,1345.4,2026-04-27,1414.4,2026-05-15,1342.1,1223.4,,,No,,,,Neckline not yet broken
+VIJAYA,Inverse H&S,Forming,2025-01-28,896.69,2025-02-17,738.51,2025-03-03,893.2,1147.66,2026-05-04,1153.8,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+VIJAYA,H&S,Forming,2025-11-14,1064.85,2025-12-04,1112.4,2026-01-01,1069.5,968.02,2026-01-20,964.2,No,,,,Neckline crossed but volume/head-leg criteria not met — not confirmed
+WOCKPHARMA,Inverse H&S,Confirmed,2026-02-13,1363.0,2026-03-23,1086.7,2026-04-30,1382.0,1485.4,2026-05-05,1537.0,Yes,1935.7,1382.0,2.57,
