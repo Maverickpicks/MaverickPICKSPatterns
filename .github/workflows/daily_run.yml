@@ -205,15 +205,22 @@ jobs:
           echo ""
           echo "  Patterns Dashboard:"
           echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_patterns.html"
+          echo ""
+          echo "  Performance Dashboard:"
+          echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_performance.html"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: Run performance logger
+        run: python performance_logger.py
 
       - name: Commit dashboards
         run: |
           git config user.name  "MaverickPICKS Bot"
           git config user.email "maverick@noreply.github.com"
           git pull --rebase origin main 2>/dev/null || true
-          git add unified_watchlist.json \
-                  dashboard_maverick.html dashboard_patterns.html 2>/dev/null || true
+          git add unified_watchlist.json performance_history.json \
+                  dashboard_maverick.html dashboard_patterns.html \
+                  dashboard_performance.html 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
