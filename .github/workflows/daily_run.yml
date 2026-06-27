@@ -195,19 +195,39 @@ jobs:
       - name: Run unified tracker
         run: python unified_tracker.py --check
 
-      - name: Show dashboard URLs
+      - name: Daily run summary
         run: |
           REPO="${{ github.repository }}"
+          IST_TIME=$(TZ='Asia/Kolkata' date '+%d-%b-%Y %H:%M IST')
           echo ""
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "  MaverickPICKS Dashboard:"
-          echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_maverick.html"
+          echo "  MaverickPICKS DAILY RUN COMPLETE"
+          echo "  Time : $IST_TIME"
+          echo "  Run  : #${{ github.run_number }}"
           echo ""
-          echo "  Patterns Dashboard:"
-          echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_patterns.html"
+          python3 -c "
+import json, os
+wl = json.load(open('unified_watchlist.json')) if os.path.exists('unified_watchlist.json') else {}
+watching   = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state')=='WATCHING')
+breakouts  = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state')=='BREAKOUT')
+breakdowns = sum(1 for b in ('maverick','patterns','hs') for p in wl.get(b,{}).values() if p.get('state') in ('BREAKDOWN','FAILED'))
+print(f'  Watchlist : {watching} watching | {breakouts} breakout(s) | {breakdowns} stop hit')
+for b in ('maverick','patterns','hs'):
+    for p in wl.get(b,{}).values():
+        if p.get('state')=='BREAKOUT':
+            print(f'  ALERT BREAKOUT  : {p[chr(115)+chr(121)+chr(109)+chr(98)+chr(111)+chr(108)]}')
+        elif p.get('state') in ('BREAKDOWN','FAILED'):
+            print(f'  ALERT BREAKDOWN : {p[chr(115)+chr(121)+chr(109)+chr(98)+chr(111)+chr(108)]}')
+ph = json.load(open('performance_history.json')) if os.path.exists('performance_history.json') else {}
+total = len(ph.get('outcomes',[]))
+wins  = sum(1 for o in ph.get('outcomes',[]) if o.get('is_win'))
+print(f'  Performance: {total} resolved | {wins} wins | {total-wins} losses')
+"
           echo ""
-          echo "  Performance Dashboard:"
-          echo "  https://htmlpreview.github.io/?https://raw.githubusercontent.com/${REPO}/main/dashboard_performance.html"
+          echo "  Dashboards (open in browser):"
+          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_maverick.html"
+          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_patterns.html"
+          echo "  ${{ github.server_url }}/${{ github.repository }}/blob/main/dashboard_performance.html"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
       - name: Run performance logger
