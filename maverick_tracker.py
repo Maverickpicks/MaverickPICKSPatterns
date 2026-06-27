@@ -423,6 +423,18 @@ def _score_bar(score):
             f'<span style="font-size:12px;color:#374151">{score:.0f}</span></div>')
 
 
+def _rv(row, *keys, default=0.0):
+    """Read value from CSV row trying multiple column names."""
+    for k in keys:
+        try:
+            v = row.get(k)
+            if v is not None and str(v).strip() not in ("","nan","None","0","0.0"):
+                return float(v)
+        except Exception:
+            pass
+    return default
+
+
 def generate_picks_dashboard():
     now = datetime.now(IST).strftime("%d-%b-%Y %H:%M IST")
 
@@ -463,11 +475,11 @@ def generate_picks_dashboard():
           <td style="padding:12px 10px;vertical-align:top;font-weight:600;color:{_conf_color(str(r.get('Confidence','')))}">
             {r.get("Confidence","")}</td>
           <td style="padding:12px 10px;text-align:right;font-weight:600;color:#1d4ed8;vertical-align:top">
-            ₹{(r.get("Entry_Breakout") or r.get("Breakout_Level") or 0):,.2f}</td>
+            ₹{_rv(r,"Entry_Breakout","Breakout_Level"):,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#dc2626;vertical-align:top">
-            ₹{(r.get("Stop_Loss") or 0):,.2f}</td>
+            ₹{_rv(r,"Stop_Loss"):,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">
-            ₹{(r.get("Target") or r.get("Target_1") or 0):,.2f}</td>
+            ₹{_rv(r,"Target","Target_1"):,.2f}</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">{r.get("Risk_Reward",0):.1f}x</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">
             {'✓' if vol_ok else '✗'}</td>
