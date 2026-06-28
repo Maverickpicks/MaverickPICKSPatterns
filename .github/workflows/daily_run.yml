@@ -5,7 +5,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '15 10 * * 1-5'   # 3:45 PM IST daily
+    - cron: '15 10 * * 1-5'   # 3:45 PM IST weekdays only
   workflow_dispatch:
     inputs:
       skip_scan:
@@ -32,8 +32,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check if market day
+        id: market_check
+        run: |
+          DAY=$(TZ='Asia/Kolkata' date '+%u')
+          echo "Day of week (1=Mon, 7=Sun): $DAY"
+          if [ "$DAY" -ge 6 ]; then
+            echo "is_weekend=true" >> $GITHUB_OUTPUT
+            echo "Weekend — scanner will be skipped to preserve existing scan_results.csv"
+          else
+            echo "is_weekend=false" >> $GITHUB_OUTPUT
+            echo "Weekday — scanner will run"
+          fi
+
       - name: Run scanner
-        if: github.event.inputs.skip_scan != 'yes'
+        if: steps.market_check.outputs.is_weekend != 'true' && github.event.inputs.skip_scan != 'yes'
         run: |
           python maverick_scanner.py --min_score 40 --workers 4
           echo "scan_results.csv: $(wc -l < scan_results.csv) rows"
