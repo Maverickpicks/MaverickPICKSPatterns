@@ -527,6 +527,11 @@ def generate_picks_dashboard():
             return m.group(1)
         return ""
 
+    # Pre-compute empty-state fallback outside f-string (backslashes not allowed
+    # inside f-string expressions in Python < 3.12)
+    _empty_row = ('<tr><td colspan="12" style="text-align:center;'
+                  'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
+
     rows = ""
     for _, r in df.iterrows():
         # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
@@ -648,7 +653,7 @@ tbody tr:hover {{ background:#f8fafc }}
     <th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
     <th>Vol✓</th><th>Expiry</th><th>Formed</th><th>Narrative & Reason</th>
   </tr></thead>
-  <tbody>{"<tr><td colspan=\"12\" style=\"text-align:center;padding:40px;color:#9ca3af\">No patterns detected today</td></tr>" if not rows else rows}</tbody>
+  <tbody>{_empty_row if not rows else rows}</tbody>
 </table>
 </div>
 <p class="note">
