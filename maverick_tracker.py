@@ -436,56 +436,164 @@ def _rv(row, *keys, default=0.0):
 
 
 def generate_picks_dashboard():
+    """
+    Generate dashboard_picks.html from patterns_today.csv.
+
+    BUG FIXES (2026-06):
+      1. Now reads patterns_today.csv (pattern_detector_v2 output) instead of
+         scan_results.csv (main_v3 output). scan_results.csv has Entry_Breakout
+         and Target columns that are 0 for pattern picks — the correct field
+         names in patterns_today.csv are Breakout_Level and Target_1.
+      2. Expiry date is now parsed from the Narrative text (no standalone
+         Expiry_Date column exists in patterns_today.csv). Also supports the
+         Expiry_Date column if pattern_detector_v2 is updated to emit it.
+      3. _rv() now correctly reads Breakout_Level / Target_1 from the CSV.
+    """
+    PATTERNS_CSV = "patterns_today.csv"
     now = datetime.now(IST).strftime("%d-%b-%Y %H:%M IST")
 
-    if not os.path.exists(SCAN_CSV):
+    if not os.path.exists(PATTERNS_CSV):
         html = f"""<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px">
         <h2>MaverickPICKS — Today's Picks</h2>
-        <p style="color:#6b7280">No scan results found. Run maverick_scanner.py first.</p>
+        <p style="color:#6b7280">No pattern scan results found ({PATTERNS_CSV}). Run pattern_detector_v2.py first.</p>
         </body></html>"""
         with open(DASH_PICKS,"w",encoding="utf-8") as f: f.write(html)
         return
 
-    df = pd.read_csv(SCAN_CSV)
+    df = pd.read_csv(PATTERNS_CSV)
     n  = len(df)
 
-    # Stats
-    n_high   = sum(df["Confidence"]=="HIGH") if "Confidence" in df.columns else 0
-    n_vol    = sum(df["Vol_All3_OK"]==True) if "Vol_All3_OK" in df.columns else 0
+    # Stats — use correct column names from pattern_detector_v2 output
+    n_high = sum(df["Confidence"] == "HIGH") if "Confidence" in df.columns else 0
+    n_vol  = sum(df["Vol_All_3_OK"] == True) if "Vol_All_3_OK" in df.columns else \
+             sum(df["Vol_All3_OK"]  == True) if "Vol_All3_OK"  in df.columns else 0
     patterns = df["Pattern"].value_counts().to_dict() if "Pattern" in df.columns else {}
+
+    def _parse_expiry(row):
+        """
+        Extract expiry date from either:
+          a) Expiry_Date column (if pattern_detector_v2 emits it — future proof)
+          b) Narrative text — parses "Valid until DD-Mon-YYYY" or
+             "EXPIRING SOON ... by DD-Mon-YYYY"
+        Returns (expiry_str, days_remaining_int_or_None)
+        """
+        # (a) Standalone column — preferred, future proof
+        for col in ("Expiry_Date", "Pattern_Expiry"):
+            val = row.get(col)
+            if val and str(val).strip() not in ("", "nan", "None"):
+                exp_str = str(val).strip()
+                try:
+                    exp_dt  = pd.to_datetime(exp_str, dayfirst=True)
+                    days_e  = (exp_dt - pd.Timestamp.today().normalize()).days
+                    return exp_str, days_e
+                except Exception:
+                    return exp_str, None
+
+        # (b) Parse from Narrative text
+        narr = str(row.get("Narrative", ""))
+        try:
+            if "Valid until" in narr:
+                part = narr.split("Valid until")[1].split("(")[0].strip()
+                exp_dt = pd.to_datetime(part, dayfirst=True)
+                days_e = (exp_dt - pd.Timestamp.today().normalize()).days
+                return exp_dt.strftime("%d-%b-%Y"), days_e
+            if "EXPIRING SOON" in narr and "by" in narr:
+                part = narr.split("EXPIRING SOON")[1]
+                part = part.split("by")[1].split(")")[0].strip().rstrip(".")
+                exp_dt = pd.to_datetime(part, dayfirst=True)
+                days_e = (exp_dt - pd.Timestamp.today().normalize()).days
+                return exp_dt.strftime("%d-%b-%Y"), days_e
+        except Exception:
+            pass
+
+        return "", None
+
+    def _parse_formed(row):
+        """
+        Extract pattern formation start date from Narrative.
+        Looks for the consolidation/triangle start date in Step 2.
+        """
+        for col in ("Pattern_Start", "Formed"):
+            val = row.get(col)
+            if val and str(val).strip() not in ("", "nan", "None"):
+                return str(val).strip()
+
+        narr = str(row.get("Narrative", ""))
+        # Bull Flag / Pennant: "[2. FLAG] From DD-Mon-YYYY to ..."
+        # Triangle:            "[2. TRIANGLE] From DD-Mon-YYYY to ..."
+        import re
+        m = re.search(r'\[2\..*?\] From (\d{2}-[A-Za-z]{3}-\d{4})', narr)
+        if m:
+            return m.group(1)
+        return ""
 
     rows = ""
     for _, r in df.iterrows():
-        exp    = str(r.get("Pattern_Expiry",""))
-        days_e = r.get("Days_To_Expiry")
-        exp_col= "#dc2626" if (days_e is not None and str(days_e).lstrip('-').isdigit() and int(float(str(days_e))) <= 2) else "#475569"
-        vol_ok = r.get("Vol_All3_OK", False)
-        narr   = str(r.get("Narrative",""))
-        # Format narrative into readable sections
+        # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
+        entry_val  = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+
+        # ── STOP: Stop_Loss — same name in both CSVs ─────────────────────────
+        stop_val   = _rv(r, "Stop_Loss")
+
+        # ── TARGET: Target_1 is the correct column in patterns_today.csv ──────
+        target_val = _rv(r, "Target_1", "Target")
+
+        # ── EXPIRY: parse from Narrative (no standalone column in CSV yet) ────
+        exp_str, days_e = _parse_expiry(r)
+
+        # ── FORMED: pattern start date from Narrative ─────────────────────────
+        formed_str = _parse_formed(r)
+
+        # ── EXPIRY colour: red if ≤2 trading days left ────────────────────────
+        exp_col = "#dc2626" if (
+            days_e is not None and days_e <= 2
+        ) else "#f59e0b" if (
+            days_e is not None and days_e <= 5
+        ) else "#475569"
+
+        # ── Vol check: Vol_All_3_OK is the v2 column name ─────────────────────
+        vol_ok = bool(r.get("Vol_All_3_OK", r.get("Vol_All3_OK", False)))
+
+        # ── Narrative: split on separator and render as sections ──────────────
+        narr      = str(r.get("Narrative", ""))
         narr_html = ""
         for chunk in narr.split("  //  "):
             if chunk.strip():
-                narr_html += f'<div style="margin-bottom:6px;padding:6px 10px;background:#f8fafc;border-left:3px solid #e2e8f0;border-radius:0 4px 4px 0;font-size:11px;color:#475569;line-height:1.6">{chunk.strip()}</div>'
+                narr_html += (
+                    f'<div style="margin-bottom:6px;padding:6px 10px;'
+                    f'background:#f8fafc;border-left:3px solid #e2e8f0;'
+                    f'border-radius:0 4px 4px 0;font-size:11px;color:#475569;'
+                    f'line-height:1.6">{chunk.strip()}</div>'
+                )
+
+        # ── Expiry display: show days remaining badge ─────────────────────────
+        if exp_str:
+            if days_e is not None and days_e <= 0:
+                exp_display = f'<span style="color:#dc2626;font-weight:600">{exp_str} (EXPIRED)</span>'
+            elif days_e is not None and days_e <= 2:
+                exp_display = f'<span style="color:#dc2626;font-weight:600">{exp_str} ⚠ {days_e}d left</span>'
+            elif days_e is not None and days_e <= 5:
+                exp_display = f'<span style="color:#f59e0b;font-weight:600">{exp_str} ({days_e}d left)</span>'
+            else:
+                exp_display = f'<span style="color:#475569">{exp_str}</span>'
+                if days_e is not None:
+                    exp_display = f'<span style="color:#475569">{exp_str} ({days_e}d)</span>'
+        else:
+            exp_display = "—"
 
         rows += f"""
         <tr>
-          <td style="padding:12px 10px;font-weight:700;font-size:13px;vertical-align:top">{r.get("Symbol","").replace(".NS","")}</td>
+          <td style="padding:12px 10px;font-weight:700;font-size:13px;vertical-align:top">{str(r.get("Symbol","")).replace(".NS","")}</td>
           <td style="padding:12px 10px;font-size:12px;color:#475569;vertical-align:top">{r.get("Pattern","")}</td>
-          <td style="padding:12px 10px;vertical-align:top">{_score_bar(r.get("Score",0))}</td>
-          <td style="padding:12px 10px;vertical-align:top;font-weight:600;color:{_conf_color(str(r.get('Confidence','')))}">
-            {r.get("Confidence","")}</td>
-          <td style="padding:12px 10px;text-align:right;font-weight:600;color:#1d4ed8;vertical-align:top">
-            ₹{_rv(r,"Entry_Breakout","Breakout_Level"):,.2f}</td>
-          <td style="padding:12px 10px;text-align:right;color:#dc2626;vertical-align:top">
-            ₹{_rv(r,"Stop_Loss"):,.2f}</td>
-          <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">
-            ₹{_rv(r,"Target","Target_1"):,.2f}</td>
-          <td style="padding:12px 10px;text-align:center;vertical-align:top">{r.get("Risk_Reward",0):.1f}x</td>
-          <td style="padding:12px 10px;text-align:center;vertical-align:top">
-            {'✓' if vol_ok else '✗'}</td>
-          <td style="padding:12px 10px;font-size:11px;color:{exp_col};vertical-align:top">{exp}</td>
-          <td style="padding:12px 10px;font-size:11px;color:#475569;vertical-align:top">
-            {r.get("Pattern_Start","")}</td>
+          <td style="padding:12px 10px;vertical-align:top">{_score_bar(float(r.get("Score",0)))}</td>
+          <td style="padding:12px 10px;vertical-align:top;font-weight:600;color:{_conf_color(str(r.get('Confidence','')))}">{r.get("Confidence","")}</td>
+          <td style="padding:12px 10px;text-align:right;font-weight:600;color:#1d4ed8;vertical-align:top">₹{entry_val:,.2f}</td>
+          <td style="padding:12px 10px;text-align:right;color:#dc2626;vertical-align:top">₹{stop_val:,.2f}</td>
+          <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">₹{target_val:,.2f}</td>
+          <td style="padding:12px 10px;text-align:center;vertical-align:top">{float(r.get("Risk_Reward",0)):.1f}x</td>
+          <td style="padding:12px 10px;text-align:center;vertical-align:top">{"✓" if vol_ok else "✗"}</td>
+          <td style="padding:12px 10px;font-size:11px;vertical-align:top">{exp_display}</td>
+          <td style="padding:12px 10px;font-size:11px;color:#475569;vertical-align:top">{formed_str}</td>
           <td style="padding:12px 10px;vertical-align:top;max-width:400px">
             <details>
               <summary style="cursor:pointer;font-size:11px;color:#1d4ed8;font-weight:600">
@@ -540,18 +648,19 @@ tbody tr:hover {{ background:#f8fafc }}
     <th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
     <th>Vol✓</th><th>Expiry</th><th>Formed</th><th>Narrative & Reason</th>
   </tr></thead>
-  <tbody>{'<tr><td colspan="12" style="text-align:center;padding:40px;color:#9ca3af">No patterns detected today</td></tr>' if not rows else rows}</tbody>
+  <tbody>{"<tr><td colspan=\"12\" style=\"text-align:center;padding:40px;color:#9ca3af\">No patterns detected today</td></tr>" if not rows else rows}</tbody>
 </table>
 </div>
 <p class="note">
-  Score = Murphy pattern quality 0-100. Vol✓ = all 3 Murphy volume checks passed (pole surge + consol contraction + declining trend).
-  Expiry = last date for pattern to break out per Murphy time rules. Entry = closing candle above this price on required volume.
+  Score = Murphy pattern quality 0-100. Entry = close above this price on required volume to confirm breakout.
+  Vol✓ = all 3 Murphy volume checks passed (pole surge + consol contraction + declining trend).
+  Expiry = last valid date per Murphy time rules — remove from watchlist if not broken out by then.
 </p>
 </body></html>"""
 
     with open(DASH_PICKS,"w",encoding="utf-8") as f:
         f.write(html)
-    print(f"  Dashboard → {DASH_PICKS}")
+    print(f"  Dashboard → {DASH_PICKS}  ({n} picks, reading from {PATTERNS_CSV})")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
