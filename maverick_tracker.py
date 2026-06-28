@@ -529,11 +529,29 @@ def generate_picks_dashboard():
 
     # Pre-compute empty-state fallback outside f-string (backslashes not allowed
     # inside f-string expressions in Python < 3.12)
-    _empty_row = ('<tr><td colspan="12" style="text-align:center;'
+    _empty_row = ('<tr><td colspan="13" style="text-align:center;'
                   'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
 
     rows = ""
     for _, r in df.iterrows():
+        # ── CMP: fetch live last close for this symbol ───────────────────────────
+        sym_raw = str(r.get("Symbol", ""))
+        cmp_val, _, cmp_date = fetch_price(sym_raw)
+        if cmp_val:
+            cmp_cell = f'₹{cmp_val:,.2f}' 
+            # Colour: green if above entry (approaching breakout), red if near stop
+            _entry_chk = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+            _stop_chk  = _rv(r, "Stop_Loss")
+            if cmp_val >= _entry_chk and _entry_chk > 0:
+                cmp_color = "#16a34a"   # green — at/above breakout
+            elif _stop_chk > 0 and cmp_val <= _stop_chk * 1.02:
+                cmp_color = "#dc2626"   # red — within 2% of stop
+            else:
+                cmp_color = "#1e293b"   # neutral
+            cmp_html = f'<span style="font-weight:600;color:{cmp_color}">{cmp_cell}</span>'
+        else:
+            cmp_html = '<span style="color:#9ca3af">—</span>'
+
         # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
         entry_val  = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
 
@@ -592,6 +610,7 @@ def generate_picks_dashboard():
           <td style="padding:12px 10px;font-size:12px;color:#475569;vertical-align:top">{r.get("Pattern","")}</td>
           <td style="padding:12px 10px;vertical-align:top">{_score_bar(float(r.get("Score",0)))}</td>
           <td style="padding:12px 10px;vertical-align:top;font-weight:600;color:{_conf_color(str(r.get('Confidence','')))}">{r.get("Confidence","")}</td>
+          <td style="padding:12px 10px;text-align:right;vertical-align:top">{cmp_html}</td>
           <td style="padding:12px 10px;text-align:right;font-weight:600;color:#1d4ed8;vertical-align:top">₹{entry_val:,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#dc2626;vertical-align:top">₹{stop_val:,.2f}</td>
           <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">₹{target_val:,.2f}</td>
@@ -650,7 +669,7 @@ tbody tr:hover {{ background:#f8fafc }}
 <table>
   <thead><tr>
     <th>Symbol</th><th>Pattern</th><th>Score</th><th>Conf</th>
-    <th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
+    <th>CMP</th><th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
     <th>Vol✓</th><th>Expiry</th><th>Formed</th><th>Narrative & Reason</th>
   </tr></thead>
   <tbody>{_empty_row if not rows else rows}</tbody>
