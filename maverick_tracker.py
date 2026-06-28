@@ -449,13 +449,15 @@ def generate_picks_dashboard():
          Expiry_Date column if pattern_detector_v2 is updated to emit it.
       3. _rv() now correctly reads Breakout_Level / Target_1 from the CSV.
     """
-    PATTERNS_CSV = "patterns_today.csv"
+    # Read scan_results.csv — this is what maverick_scanner.py writes during the workflow.
+    # patterns_today.csv is only written by pattern_detector_v2.py which is not in the workflow.
+    PATTERNS_CSV = SCAN_CSV   # scan_results.csv
     now = datetime.now(IST).strftime("%d-%b-%Y %H:%M IST")
 
     if not os.path.exists(PATTERNS_CSV):
         html = f"""<!DOCTYPE html><html><body style="font-family:sans-serif;padding:40px">
         <h2>MaverickPICKS — Today's Picks</h2>
-        <p style="color:#6b7280">No pattern scan results found ({PATTERNS_CSV}). Run pattern_detector_v2.py first.</p>
+        <p style="color:#6b7280">No scan results found. Run maverick_scanner.py first.</p>
         </body></html>"""
         with open(DASH_PICKS,"w",encoding="utf-8") as f: f.write(html)
         return
@@ -541,9 +543,12 @@ def generate_picks_dashboard():
     _symbols = df["Symbol"].dropna().tolist()
     _cmp_map = {}
     for _sym in _symbols:
-        _sym_key = _sym.replace(".NS", "")
+        # Strip .NS before passing to fetch_price() — it adds .NS itself.
+        # Without this, CONCORDBIO.NS becomes CONCORDBIO.NS.NS and returns None.
+        _sym_clean = _sym.replace(".NS", "").replace(".BO", "")
+        _sym_key   = _sym_clean   # map key = bare symbol e.g. CONCORDBIO
         try:
-            _close, _vol, _date = fetch_price(_sym)
+            _close, _vol, _date = fetch_price(_sym_clean)
             if _close is not None:
                 _cmp_map[_sym_key] = _close
                 print(f"    CMP {_sym_key}: Rs{_close:.2f} ({_date})")
