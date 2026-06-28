@@ -532,23 +532,57 @@ def generate_picks_dashboard():
     _empty_row = ('<tr><td colspan="13" style="text-align:center;'
                   'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
 
+    # ── Batch-fetch CMP for all symbols in ONE yfinance call ─────────────────
+    # Much faster than 56 individual calls; avoids rate-limit / Actions timeout.
+    print("  Fetching CMP for all pattern symbols (batch)...")
+    _symbols = df["Symbol"].dropna().tolist()
+    _tickers = [s if s.endswith(".NS") else s + ".NS" for s in _symbols]
+    _cmp_map = {}   # symbol (no .NS) → last close float
+    try:
+        _end   = ANCHOR + timedelta(days=1)
+        _start = ANCHOR - timedelta(days=10)
+        _raw   = yf.download(
+            _tickers, start=_start, end=_end,
+            interval="1d", auto_adjust=False,
+            progress=False, threads=True, group_by="ticker",
+        )
+        for _t in _tickers:
+            _sym_key = _t.replace(".NS", "")
+            try:
+                if isinstance(_raw.columns, pd.MultiIndex):
+                    # Modern yfinance (0.2.x+): MultiIndex is (Field, Ticker)
+                    # e.g. ("Close", "RELIANCE.NS") — field is level 0, ticker is level 1
+                    try:
+                        _col = _raw["Close"][_t]
+                    except KeyError:
+                        _col = None
+                else:
+                    # Single ticker download — flat columns
+                    _col = _raw["Close"] if "Close" in _raw.columns else None
+                if _col is not None and not _col.dropna().empty:
+                    _cmp_map[_sym_key] = float(_col.dropna().iloc[-1])
+            except Exception:
+                pass
+        print(f"  CMP fetched for {len(_cmp_map)}/{len(_tickers)} symbols")
+    except Exception as e:
+        print(f"  [WARN] Batch CMP fetch failed: {e} — CMP column will show —")
+
     rows = ""
     for _, r in df.iterrows():
-        # ── CMP: fetch live last close for this symbol ───────────────────────────
-        sym_raw = str(r.get("Symbol", ""))
-        cmp_val, _, cmp_date = fetch_price(sym_raw)
+        # ── CMP: look up from pre-fetched batch map ───────────────────────────
+        sym_raw  = str(r.get("Symbol", "")).replace(".NS", "")
+        cmp_val  = _cmp_map.get(sym_raw)
         if cmp_val:
-            cmp_cell = f'₹{cmp_val:,.2f}' 
-            # Colour: green if above entry (approaching breakout), red if near stop
+            # Colour: green = at/above breakout, red = within 2% of stop, neutral otherwise
             _entry_chk = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
             _stop_chk  = _rv(r, "Stop_Loss")
             if cmp_val >= _entry_chk and _entry_chk > 0:
-                cmp_color = "#16a34a"   # green — at/above breakout
+                cmp_color = "#16a34a"   # green — at/above breakout level
             elif _stop_chk > 0 and cmp_val <= _stop_chk * 1.02:
-                cmp_color = "#dc2626"   # red — within 2% of stop
+                cmp_color = "#dc2626"   # red — dangerously close to stop
             else:
                 cmp_color = "#1e293b"   # neutral
-            cmp_html = f'<span style="font-weight:600;color:{cmp_color}">{cmp_cell}</span>'
+            cmp_html = f'<span style="font-weight:600;color:{cmp_color}">₹{cmp_val:,.2f}</span>'
         else:
             cmp_html = '<span style="color:#9ca3af">—</span>'
 
