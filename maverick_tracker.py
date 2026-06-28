@@ -579,19 +579,53 @@ def generate_picks_dashboard():
         else:
             cmp_html = '<span style="color:#9ca3af">—</span>'
 
-        # ── STAGE, PRIME WINDOW, HEALTH from new CSV columns ─────────────────
-        stage_raw  = str(r.get("Pattern_Stage", "") or "").strip()
-        stage_col  = _stage_col.get(stage_raw, "#6b7280")
-        stage_lbl  = _stage_label.get(stage_raw, stage_raw or "—")
-        pct_used   = r.get("Pct_Time_Used", "")
-        pct_str    = f"{float(pct_used):.0f}%" if pct_used != "" else ""
-        win_start  = str(r.get("Ideal_Window_Start", "") or "")
-        win_end    = str(r.get("Ideal_Window_End",   "") or "")
-        win_str    = f"{win_start} → {win_end}" if win_start and win_end else "—"
-        health_raw = r.get("Health_Pct", "")
-        health_val = int(float(health_raw)) if health_raw != "" else 0
+        # STAGE, PRIME WINDOW, HEALTH — calculated from existing CSV columns
+        # Works immediately from current scan_results.csv without re-running scanner
+        import math as _math
+        _pat    = str(r.get("Pattern", ""))
+        _pole   = int(float(r.get("Pole_Bars",   0) or 0))
+        _consol = int(float(r.get("Consol_Bars", 0) or 0))
+        _gap    = float(r.get("Gap_To_Break_%", 0) or 0)
+        _entryh = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+        _stoph  = _rv(r, "Stop_Loss")
+        _cmph   = round(_entryh / (1 + _gap/100), 2) if _entryh > 0 and _gap >= 0 else 0
+        _v3     = bool(r.get("Vol_All_3_OK",     r.get("Vol_All3_OK",   False)))
+        _vavg   = bool(r.get("Vol_Consol_Avg_OK", False))
+        _vtrn   = bool(r.get("Vol_Trend_Decline",  False))
+        if _pat in ("Bull Flag", "Pennant"):
+            _maxc = _math.ceil(_pole * 2/3) if _pole > 0 else max(_consol, 1)
+        else:
+            _maxc = _math.ceil(_consol / 0.75) if _consol > 0 else max(_consol, 1)
+        _pct = round(_consol / _maxc * 100, 1) if _maxc > 0 else 0
+        if _pct < 40:   stage_raw = "EARLY"
+        elif _pct < 75: stage_raw = "PRIME"
+        elif _pct < 90: stage_raw = "LATE"
+        else:           stage_raw = "OVERDUE"
+        stage_col = _stage_col.get(stage_raw, "#6b7280")
+        stage_lbl = _stage_label.get(stage_raw, stage_raw)
+        pct_str   = f"{_pct:.0f}%"
+        _today    = pd.Timestamp.today().normalize()
+        _ws = _today + pd.tseries.offsets.BDay(max(0, _math.ceil(_maxc*0.40) - _consol))
+        _we = _today + pd.tseries.offsets.BDay(max(0, _math.ceil(_maxc*0.75) - _consol))
+        win_str   = f"{pd.Timestamp(_ws).strftime('%d-%b')} to {pd.Timestamp(_we).strftime('%d-%b-%Y')}"
+        _h = 0
+        if _stoph > 0 and _cmph > 0 and _cmph <= _stoph: _h += 0
+        elif _gap <= 5:  _h += 40
+        elif _gap <= 10: _h += 30
+        elif _gap <= 20: _h += 15
+        else:            _h += 5
+        if _v3:              _h += 30
+        elif _vavg and _vtrn: _h += 18
+        elif _vavg or _vtrn:  _h += 8
+        if _pct < 40:   _h += 12
+        elif _pct < 75: _h += 20
+        elif _pct < 90: _h += 8
+        if _entryh > _stoph > 0 and _cmph > 0:
+            if (_entryh - _cmph) / (_entryh - _stoph) <= 0.5: _h += 10
+        health_val = min(100, max(0, round(_h)))
         health_col = "#16a34a" if health_val >= 70 else "#f59e0b" if health_val >= 45 else "#dc2626"
-        health_bd  = str(r.get("Health_Breakdown", "") or "")
+        _vstr = "3/3" if _v3 else ("2/3" if (_vavg and _vtrn) else ("1/3" if (_vavg or _vtrn) else "0/3"))
+        health_bd  = f"Gap {_gap:.1f}% | Vol {_vstr} | Stage {stage_raw} ({_pct:.0f}%)"
 
         # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
         entry_val  = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
