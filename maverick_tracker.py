@@ -532,40 +532,26 @@ def generate_picks_dashboard():
     _empty_row = ('<tr><td colspan="13" style="text-align:center;'
                   'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
 
-    # ── Batch-fetch CMP for all symbols in ONE yfinance call ─────────────────
-    # Much faster than 56 individual calls; avoids rate-limit / Actions timeout.
-    print("  Fetching CMP for all pattern symbols (batch)...")
+    # ── Fetch CMP: one ticker at a time using existing fetch_price() ─────────
+    # Batch yfinance downloads have proven unreliable in this environment due to
+    # MultiIndex column structure varying by yfinance version. Using individual
+    # fetch_price() calls (which already work for the watchlist check) is safer.
+    # fetch_price() already handles retries, ANCHOR date, and .NS suffix.
+    print("  Fetching CMP for pattern symbols...")
     _symbols = df["Symbol"].dropna().tolist()
-    _tickers = [s if s.endswith(".NS") else s + ".NS" for s in _symbols]
-    _cmp_map = {}   # symbol (no .NS) → last close float
-    try:
-        _end   = ANCHOR + timedelta(days=1)
-        _start = ANCHOR - timedelta(days=10)
-        _raw   = yf.download(
-            _tickers, start=_start, end=_end,
-            interval="1d", auto_adjust=False,
-            progress=False, threads=True, group_by="ticker",
-        )
-        for _t in _tickers:
-            _sym_key = _t.replace(".NS", "")
-            try:
-                if isinstance(_raw.columns, pd.MultiIndex):
-                    # Modern yfinance (0.2.x+): MultiIndex is (Field, Ticker)
-                    # e.g. ("Close", "RELIANCE.NS") — field is level 0, ticker is level 1
-                    try:
-                        _col = _raw["Close"][_t]
-                    except KeyError:
-                        _col = None
-                else:
-                    # Single ticker download — flat columns
-                    _col = _raw["Close"] if "Close" in _raw.columns else None
-                if _col is not None and not _col.dropna().empty:
-                    _cmp_map[_sym_key] = float(_col.dropna().iloc[-1])
-            except Exception:
-                pass
-        print(f"  CMP fetched for {len(_cmp_map)}/{len(_tickers)} symbols")
-    except Exception as e:
-        print(f"  [WARN] Batch CMP fetch failed: {e} — CMP column will show —")
+    _cmp_map = {}
+    for _sym in _symbols:
+        _sym_key = _sym.replace(".NS", "")
+        try:
+            _close, _vol, _date = fetch_price(_sym)
+            if _close is not None:
+                _cmp_map[_sym_key] = _close
+                print(f"    CMP {_sym_key}: Rs{_close:.2f} ({_date})")
+            else:
+                print(f"    CMP {_sym_key}: fetch returned None")
+        except Exception as _e:
+            print(f"    CMP {_sym_key}: exception — {_e}")
+    print(f"  CMP fetched for {len(_cmp_map)}/{len(_symbols)} symbols")
 
     rows = ""
     for _, r in df.iterrows():
