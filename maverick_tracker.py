@@ -184,7 +184,7 @@ def import_picks(wl: dict) -> tuple:
             "stop_loss":     _f(row, "Stop_Loss"),
             "target":        _f(row, "Target", "Target_1"),
             "risk_reward":   _f(row, "Risk_Reward"),
-            "gap_pct":       _f(row, "Gap_To_Entry_%", "Gap_To_Break_%"),
+            "gap_pct":       _f(row, "Gap_To_Entry_%", "Gap_To_Entry_%"),
             "pattern_start": _s(row, "Pattern_Start"),
             "pattern_expiry":_s(row, "Pattern_Expiry"),
             "days_to_expiry":row.get("Days_To_Expiry"),
@@ -467,8 +467,8 @@ def generate_picks_dashboard():
 
     # Stats — use correct column names from pattern_detector_v2 output
     n_high = sum(df["Confidence"] == "HIGH") if "Confidence" in df.columns else 0
-    n_vol  = sum(df["Vol_All_3_OK"] == True) if "Vol_All_3_OK" in df.columns else \
-             sum(df["Vol_All3_OK"]  == True) if "Vol_All3_OK"  in df.columns else 0
+    n_vol  = sum(df["Vol_All3_OK"] == True) if "Vol_All3_OK" in df.columns else \
+             sum(df["Vol_All_3_OK"]  == True) if "Vol_All_3_OK"  in df.columns else 0
     patterns = df["Pattern"].value_counts().to_dict() if "Pattern" in df.columns else {}
 
     def _parse_expiry(row):
@@ -543,7 +543,7 @@ def generate_picks_dashboard():
         _sym_key = str(_r.get("Symbol", "")).replace(".NS", "").replace(".BO", "")
         try:
             _entry = float(_r.get("Breakout_Level") or 0)
-            _gap   = float(_r.get("Gap_To_Break_%") or 0)
+            _gap   = float(_r.get("Gap_To_Entry_%") or 0)
             if _entry > 0 and _gap >= 0:
                 _cmp_map[_sym_key] = round(_entry / (1 + _gap / 100), 2)
         except Exception:
@@ -567,7 +567,7 @@ def generate_picks_dashboard():
         cmp_val  = _cmp_map.get(sym_raw)
         if cmp_val:
             # Colour: green = at/above breakout, red = within 2% of stop, neutral otherwise
-            _entry_chk = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+            _entry_chk = _rv(r, "Entry_Breakout", "Breakout_Level", "Entry")
             _stop_chk  = _rv(r, "Stop_Loss")
             if cmp_val >= _entry_chk and _entry_chk > 0:
                 cmp_color = "#16a34a"   # green — at/above breakout level
@@ -585,13 +585,13 @@ def generate_picks_dashboard():
         _pat    = str(r.get("Pattern", ""))
         _pole   = int(float(r.get("Pole_Bars",   0) or 0))
         _consol = int(float(r.get("Consol_Bars", 0) or 0))
-        _gap    = float(r.get("Gap_To_Break_%", 0) or 0)
-        _entryh = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+        _gap    = float(r.get("Gap_To_Entry_%", 0) or 0)
+        _entryh = _rv(r, "Entry_Breakout", "Breakout_Level", "Entry")
         _stoph  = _rv(r, "Stop_Loss")
         _cmph   = round(_entryh / (1 + _gap/100), 2) if _entryh > 0 and _gap >= 0 else 0
-        _v3     = bool(r.get("Vol_All_3_OK",     r.get("Vol_All3_OK",   False)))
-        _vavg   = bool(r.get("Vol_Consol_Avg_OK", False))
-        _vtrn   = bool(r.get("Vol_Trend_Decline",  False))
+        _v3     = bool(r.get("Vol_All3_OK",     r.get("Vol_All_3_OK",   False)))
+        _vavg   = bool(r.get("Vol_Consol_Avg_OK", _v3))
+        _vtrn   = bool(r.get("Vol_Trend_Decline",  _v3))
         if _pat in ("Bull Flag", "Pennant"):
             _maxc = _math.ceil(_pole * 2/3) if _pole > 0 else max(_consol, 1)
         else:
@@ -628,19 +628,25 @@ def generate_picks_dashboard():
         health_bd  = f"Gap {_gap:.1f}% | Vol {_vstr} | Stage {stage_raw} ({_pct:.0f}%)"
 
         # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
-        entry_val  = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
+        entry_val  = _rv(r, "Entry_Breakout", "Breakout_Level", "Entry")
 
         # ── STOP: Stop_Loss — same name in both CSVs ─────────────────────────
         stop_val   = _rv(r, "Stop_Loss")
 
         # ── TARGET: Target_1 is the correct column in patterns_today.csv ──────
-        target_val = _rv(r, "Target_1", "Target")
+        target_val = _rv(r, "Target", "Target_1")
 
         # ── EXPIRY: parse from Narrative (no standalone column in CSV yet) ────
         exp_str, days_e = _parse_expiry(r)
+        # Days_To_Expiry is directly in scan_results.csv — use it if available
+        _dte = r.get("Days_To_Expiry")
+        if _dte is not None and str(_dte).lstrip("-").isdigit():
+            days_e = int(float(str(_dte)))
 
         # ── FORMED: pattern start date from Narrative ─────────────────────────
-        formed_str = _parse_formed(r)
+        formed_str = str(r.get("Pattern_Start", "") or "")
+        if not formed_str or formed_str == "nan":
+            formed_str = _parse_formed(r)
 
         # ── EXPIRY colour: red if ≤2 trading days left ────────────────────────
         exp_col = "#dc2626" if (
