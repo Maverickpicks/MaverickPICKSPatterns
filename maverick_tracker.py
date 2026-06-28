@@ -531,7 +531,7 @@ def generate_picks_dashboard():
 
     # Pre-compute empty-state fallback outside f-string (backslashes not allowed
     # inside f-string expressions in Python < 3.12)
-    _empty_row = ('<tr><td colspan="13" style="text-align:center;'
+    _empty_row = ('<tr><td colspan="16" style="text-align:center;'
                   'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
 
     # ── Derive CMP from data already in the CSV — no yfinance call needed ──────
@@ -549,6 +549,16 @@ def generate_picks_dashboard():
         except Exception:
             pass
     print(f"  CMP derived for {len(_cmp_map)} symbols from scan data")
+
+    # Stage colour map
+    _stage_col = {"EARLY":"#6b7280","PRIME":"#16a34a","LATE":"#f59e0b","OVERDUE":"#dc2626"}
+    _stage_label = {
+        "EARLY":   "🔵 EARLY — still forming",
+        "PRIME":   "🟢 PRIME — ideal zone",
+        "LATE":    "🟡 LATE — energy fading",
+        "OVERDUE": "🔴 OVERDUE — expect failure",
+        "UNKNOWN": "— Unknown",
+    }
 
     rows = ""
     for _, r in df.iterrows():
@@ -568,6 +578,20 @@ def generate_picks_dashboard():
             cmp_html = f'<span style="font-weight:600;color:{cmp_color}">₹{cmp_val:,.2f}</span>'
         else:
             cmp_html = '<span style="color:#9ca3af">—</span>'
+
+        # ── STAGE, PRIME WINDOW, HEALTH from new CSV columns ─────────────────
+        stage_raw  = str(r.get("Pattern_Stage", "") or "").strip()
+        stage_col  = _stage_col.get(stage_raw, "#6b7280")
+        stage_lbl  = _stage_label.get(stage_raw, stage_raw or "—")
+        pct_used   = r.get("Pct_Time_Used", "")
+        pct_str    = f"{float(pct_used):.0f}%" if pct_used != "" else ""
+        win_start  = str(r.get("Ideal_Window_Start", "") or "")
+        win_end    = str(r.get("Ideal_Window_End",   "") or "")
+        win_str    = f"{win_start} → {win_end}" if win_start and win_end else "—"
+        health_raw = r.get("Health_Pct", "")
+        health_val = int(float(health_raw)) if health_raw != "" else 0
+        health_col = "#16a34a" if health_val >= 70 else "#f59e0b" if health_val >= 45 else "#dc2626"
+        health_bd  = str(r.get("Health_Breakdown", "") or "")
 
         # ── ENTRY: Breakout_Level is the correct column in patterns_today.csv ──
         entry_val  = _rv(r, "Breakout_Level", "Entry_Breakout", "Entry")
@@ -633,6 +657,15 @@ def generate_picks_dashboard():
           <td style="padding:12px 10px;text-align:right;color:#16a34a;vertical-align:top">₹{target_val:,.2f}</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">{float(r.get("Risk_Reward",0)):.1f}x</td>
           <td style="padding:12px 10px;text-align:center;vertical-align:top">{"✓" if vol_ok else "✗"}</td>
+          <td style="padding:8px 10px;vertical-align:top">
+            <span style="font-size:11px;font-weight:600;color:{stage_col}">{stage_lbl}</span>
+            <div style="font-size:10px;color:#94a3b8;margin-top:2px">{pct_str} of window used</div>
+          </td>
+          <td style="padding:8px 10px;font-size:11px;color:#475569;vertical-align:top;white-space:nowrap">{win_str}</td>
+          <td style="padding:8px 10px;vertical-align:top;text-align:center">
+            <span style="font-weight:700;font-size:13px;color:{health_col}">{health_val}%</span>
+            <div style="font-size:10px;color:#94a3b8;margin-top:2px" title="{health_bd}">{health_bd[:35]}{"…" if len(health_bd)>35 else ""}</div>
+          </td>
           <td style="padding:12px 10px;font-size:11px;vertical-align:top">{exp_display}</td>
           <td style="padding:12px 10px;font-size:11px;color:#475569;vertical-align:top">{formed_str}</td>
           <td style="padding:12px 10px;vertical-align:top;max-width:400px">
@@ -687,15 +720,17 @@ tbody tr:hover {{ background:#f8fafc }}
   <thead><tr>
     <th>Symbol</th><th>Pattern</th><th>Score</th><th>Conf</th>
     <th>CMP</th><th>Entry</th><th>Stop</th><th>Target</th><th>R:R</th>
-    <th>Vol✓</th><th>Expiry</th><th>Formed</th><th>Narrative & Reason</th>
+    <th>Vol✓</th><th>Stage</th><th>Prime Window</th><th>Health%</th><th>Expiry</th><th>Formed</th><th>Narrative & Reason</th>
   </tr></thead>
   <tbody>{_empty_row if not rows else rows}</tbody>
 </table>
 </div>
 <p class="note">
   Score = Murphy pattern quality 0-100. Entry = close above this price on required volume to confirm breakout.
-  Vol✓ = all 3 Murphy volume checks passed (pole surge + consol contraction + declining trend).
-  Expiry = last valid date per Murphy time rules — remove from watchlist if not broken out by then.
+  Vol✓ = all 3 Murphy volume checks (pole surge + consol contraction + declining trend).
+  Stage: EARLY &lt;40% window used | PRIME 40-75% ideal zone | LATE 75-90% fading | OVERDUE &gt;90% expect failure.
+  Prime Window = dates when breakout is most expected per Murphy. Health% = overall setup strength 0-100.
+  Expiry = hard Murphy deadline — remove from watchlist if not broken out by then.
 </p>
 </body></html>"""
 

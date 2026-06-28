@@ -128,6 +128,12 @@ class PatternResult:
     weekly: Optional[WeeklyConfirmation] = None
     notes: list = field(default_factory=list)
     narrative: str = ""        # human-readable story with dates and prices
+    pattern_stage: str = ""
+    pct_time_used: float = 0.0
+    ideal_window_start: str = ""
+    ideal_window_end: str = ""
+    health_pct: int = 0
+    health_breakdown: str = ""
 
     def to_dict(self) -> dict:
         vp = self.volume_profile
@@ -155,6 +161,12 @@ class PatternResult:
             "Weekly_Confirmed":   wk.confirmed() if wk else None,
             "Notes":              " | ".join(self.notes),
             "Narrative":          self.narrative,
+            "Pattern_Stage":      self.pattern_stage,
+            "Pct_Time_Used":      round(self.pct_time_used, 1),
+            "Ideal_Window_Start": self.ideal_window_start,
+            "Ideal_Window_End":   self.ideal_window_end,
+            "Health_Pct":         self.health_pct,
+            "Health_Breakdown":   self.health_breakdown,
         }
 
 
@@ -325,6 +337,79 @@ def _fmt_date(ts) -> str:
 
 
 
+
+def _pattern_stage(pct_used: float) -> str:
+    """
+    Murphy stage based on % of allowed time window consumed.
+      Early   <40%  — still forming, not ready to act
+      Prime  40-75% — ideal watch zone (sufficient compression, good runway)
+      Late   75-90% — valid but energy fading
+      Overdue >90%  — Murphy expects failure more than breakout
+    """
+    if pct_used < 40:   return "EARLY"
+    elif pct_used < 75: return "PRIME"
+    elif pct_used < 90: return "LATE"
+    else:               return "OVERDUE"
+
+
+def _ideal_window_dates(max_consol: int, bars_used: int) -> tuple:
+    """Prime breakout window = 40%-75% of allowed bars. Returns (start_str, end_str)."""
+    import math as _m
+    today         = pd.Timestamp.today().normalize()
+    bars_to_start = _m.ceil(max_consol * 0.40) - bars_used
+    bars_to_end   = _m.ceil(max_consol * 0.75) - bars_used
+    start_dt      = today + pd.tseries.offsets.BDay(max(0, bars_to_start))
+    end_dt        = today + pd.tseries.offsets.BDay(max(0, bars_to_end))
+    fmt = lambda d: pd.Timestamp(d).strftime("%d-%b-%Y")
+    return fmt(start_dt), fmt(end_dt)
+
+
+def _pattern_health(gap_pct: float, vol_all3: bool, vol_avg_ok: bool,
+                    vol_trend_ok: bool, pct_time_used: float,
+                    cmp: float, entry: float, stop: float) -> tuple:
+    """
+    Health score 0-100 across 4 Murphy factors. Returns (score_int, breakdown_str).
+    F1 Price proximity 40pts | F2 Volume 30pts | F3 Time runway 20pts | F4 CMP position 10pts
+    """
+    h = 0; bd = []
+    # F1
+    if stop > 0 and cmp > 0 and cmp <= stop:
+        h += 0;  bd.append(f"Price<Stop ✗")
+    elif gap_pct <= 5:
+        h += 40; bd.append(f"Gap {gap_pct:.1f}% ✓✓")
+    elif gap_pct <= 10:
+        h += 30; bd.append(f"Gap {gap_pct:.1f}% ✓")
+    elif gap_pct <= 20:
+        h += 15; bd.append(f"Gap {gap_pct:.1f}%")
+    else:
+        h += 5;  bd.append(f"Gap {gap_pct:.1f}% ✗")
+    # F2
+    if vol_all3:
+        h += 30; bd.append("Vol 3/3 ✓✓")
+    elif sum([vol_avg_ok, vol_trend_ok]) == 2:
+        h += 18; bd.append("Vol 2/3 ✓")
+    elif sum([vol_avg_ok, vol_trend_ok]) == 1:
+        h += 8;  bd.append("Vol 1/3 —")
+    else:
+        h += 0;  bd.append("Vol ✗")
+    # F3
+    if pct_time_used < 40:
+        h += 12; bd.append("Early")
+    elif pct_time_used < 75:
+        h += 20; bd.append("Prime ✓")
+    elif pct_time_used < 90:
+        h += 8;  bd.append("Late")
+    else:
+        h += 0;  bd.append("Overdue ✗")
+    # F4
+    if entry > stop > 0 and cmp > 0:
+        if (entry - cmp) / (entry - stop) <= 0.5:
+            h += 10; bd.append("Near entry ✓")
+        else:
+            h += 0;  bd.append("Near stop ✗")
+    return min(100, max(0, round(h))), " | ".join(bd)
+
+
 def _pattern_expiry(pattern: str,
                     pole_df,
                     consol_df,
@@ -387,7 +472,10 @@ def _pattern_expiry(pattern: str,
             f"Pattern has used {bars_used} of {max_consol} allowed bars — "
             f"{overdue_note}."
         )
-        return D(expiry_date), days_to_expiry, is_soon, reason
+        pct_used = round(bars_used / max_consol * 100, 1) if max_consol > 0 else 0
+        stage    = _pattern_stage(pct_used)
+        win_s, win_e = _ideal_window_dates(max_consol, bars_used)
+        return D(expiry_date), days_to_expiry, is_soon, reason, stage, pct_used, win_s, win_e
 
     elif pattern in ("Symmetrical Triangle", "Ascending Triangle"):
         if consol_df is None or len(consol_df) < 5:
@@ -430,9 +518,12 @@ def _pattern_expiry(pattern: str,
             f"3/4 mark = {max_bars} bars. "
             f"Pattern has used {bars_used} bars, {overdue_note}."
         )
-        return D(expiry_date), days_to_expiry, is_soon, reason
+        pct_used = round(bars_used / max_bars * 100, 1) if max_bars > 0 else 0
+        stage    = _pattern_stage(pct_used)
+        win_s, win_e = _ideal_window_dates(max_bars, bars_used)
+        return D(expiry_date), days_to_expiry, is_soon, reason, stage, pct_used, win_s, win_e
 
-    return None, None, False, ""
+    return None, None, False, "", "UNKNOWN", 0.0, "", ""
 
 def _build_narrative(symbol: str,
                      pattern: str,
@@ -925,7 +1016,7 @@ def detect_bull_flag(symbol: str, df: pd.DataFrame,
                 pole_len = pole_df["High"].max() - pole_df["Low"].min()
                 target   = breakout + pole_len
                 conf     = _confidence(score, vp, weekly)
-                exp_date, exp_days, exp_soon, exp_reason = _pattern_expiry(
+                exp_date, exp_days, exp_soon, exp_reason, exp_stage, exp_pct, exp_win_s, exp_win_e = _pattern_expiry(
                     "Bull Flag", pole_df, consol_df, actual_consol_bars=cl)
                 # Murphy time-limit gate: expired patterns are invalid — exclude entirely
                 # A score of 100 on an expired setup is meaningless and actively misleading
@@ -940,6 +1031,10 @@ def detect_bull_flag(symbol: str, df: pd.DataFrame,
                     expiry_date=exp_date, days_remaining=exp_days,
                     is_expiring_soon=exp_soon, expiry_reason=exp_reason,
                 )
+                _cmp_v = round(breakout/(1+gap/100),2) if gap>=0 else 0
+                _hp, _hb = _pattern_health(gap, vp.all_confirmed if vp else False,
+                    vp.consol_avg_ok if vp else False, vp.consol_trend_declining if vp else False,
+                    exp_pct, _cmp_v, breakout, stop)
                 best = PatternResult(
                     symbol=symbol, pattern="Bull Flag",
                     detected=score >= 40, in_formation=True,
@@ -956,6 +1051,9 @@ def detect_bull_flag(symbol: str, df: pd.DataFrame,
                     weekly=weekly,
                     notes=notes,
                     narrative=narr,
+                    pattern_stage=exp_stage, pct_time_used=exp_pct,
+                    ideal_window_start=exp_win_s, ideal_window_end=exp_win_e,
+                    health_pct=_hp, health_breakdown=_hb,
                 )
 
     return best or empty
@@ -1047,7 +1145,7 @@ def detect_pennant(symbol: str, df: pd.DataFrame,
                 pole_len = pole_df["High"].max() - pole_df["Low"].min()
                 target   = breakout + pole_len
                 conf     = _confidence(score, vp, weekly)
-                exp_date, exp_days, exp_soon, exp_reason = _pattern_expiry(
+                exp_date, exp_days, exp_soon, exp_reason, exp_stage, exp_pct, exp_win_s, exp_win_e = _pattern_expiry(
                     "Pennant", pole_df, consol_df, actual_consol_bars=cl)
                 # Murphy time-limit gate
                 if exp_days is not None and exp_days < 0:
@@ -1061,6 +1159,10 @@ def detect_pennant(symbol: str, df: pd.DataFrame,
                     expiry_date=exp_date, days_remaining=exp_days,
                     is_expiring_soon=exp_soon, expiry_reason=exp_reason,
                 )
+                _cmp_v = round(breakout/(1+gap/100),2) if gap>=0 else 0
+                _hp, _hb = _pattern_health(gap, vp.all_confirmed if vp else False,
+                    vp.consol_avg_ok if vp else False, vp.consol_trend_declining if vp else False,
+                    exp_pct, _cmp_v, breakout, stop)
                 best = PatternResult(
                     symbol=symbol, pattern="Pennant",
                     detected=score >= 40, in_formation=True,
@@ -1077,6 +1179,9 @@ def detect_pennant(symbol: str, df: pd.DataFrame,
                     weekly=weekly,
                     notes=notes,
                     narrative=narr,
+                    pattern_stage=exp_stage, pct_time_used=exp_pct,
+                    ideal_window_start=exp_win_s, ideal_window_end=exp_win_e,
+                    health_pct=_hp, health_breakdown=_hb,
                 )
 
     return best or empty
@@ -1192,7 +1297,7 @@ def detect_symmetrical_triangle(symbol: str, df: pd.DataFrame,
     detected = score >= 50
     conf = _confidence(score, vp, weekly)
 
-    exp_date, exp_days, exp_soon, exp_reason = _pattern_expiry(
+    exp_date, exp_days, exp_soon, exp_reason, exp_stage, exp_pct, exp_win_s, exp_win_e = _pattern_expiry(
         "Symmetrical Triangle", None, tri_df,
         swing_highs_dates=list(highs_idx[-2:]),
         swing_lows_dates=list(lows_idx[-2:]),
@@ -1210,6 +1315,10 @@ def detect_symmetrical_triangle(symbol: str, df: pd.DataFrame,
         expiry_date=exp_date, days_remaining=exp_days,
         is_expiring_soon=exp_soon, expiry_reason=exp_reason,
     )
+    _cmp_v = round(breakout/(1+gap/100),2) if gap>=0 else 0
+    _hp, _hb = _pattern_health(gap, vp.all_confirmed if vp else False,
+        vp.consol_avg_ok if vp else False, vp.consol_trend_declining if vp else False,
+        exp_pct, _cmp_v, breakout, stop)
     return PatternResult(
         symbol=symbol, pattern="Symmetrical Triangle",
         detected=detected, in_formation=True,
@@ -1226,6 +1335,9 @@ def detect_symmetrical_triangle(symbol: str, df: pd.DataFrame,
         weekly=weekly,
         notes=notes,
         narrative=narr,
+        pattern_stage=exp_stage, pct_time_used=exp_pct,
+        ideal_window_start=exp_win_s, ideal_window_end=exp_win_e,
+        health_pct=_hp, health_breakdown=_hb,
     )
 
 
@@ -1334,7 +1446,7 @@ def detect_ascending_triangle(symbol: str, df: pd.DataFrame,
     detected = score >= 55
     conf = _confidence(score, vp, weekly)
 
-    exp_date, exp_days, exp_soon, exp_reason = _pattern_expiry(
+    exp_date, exp_days, exp_soon, exp_reason, exp_stage, exp_pct, exp_win_s, exp_win_e = _pattern_expiry(
         "Ascending Triangle", None, tri_df,
         swing_highs_dates=list(highs_idx[-3:] if len(highs_idx) >= 3 else highs_idx[-2:]),
         swing_lows_dates=list(lows_idx[-3:] if len(lows_idx) >= 3 else lows_idx[-2:]),
@@ -1352,6 +1464,10 @@ def detect_ascending_triangle(symbol: str, df: pd.DataFrame,
         expiry_date=exp_date, days_remaining=exp_days,
         is_expiring_soon=exp_soon, expiry_reason=exp_reason,
     )
+    _cmp_v = round(resistance/(1+gap/100),2) if gap>=0 else 0
+    _hp, _hb = _pattern_health(gap, vp.all_confirmed if vp else False,
+        vp.consol_avg_ok if vp else False, vp.consol_trend_declining if vp else False,
+        exp_pct, _cmp_v, resistance, stop)
     return PatternResult(
         symbol=symbol, pattern="Ascending Triangle",
         detected=detected, in_formation=True,
@@ -1368,6 +1484,9 @@ def detect_ascending_triangle(symbol: str, df: pd.DataFrame,
         weekly=weekly,
         notes=notes,
         narrative=narr,
+        pattern_stage=exp_stage, pct_time_used=exp_pct,
+        ideal_window_start=exp_win_s, ideal_window_end=exp_win_e,
+        health_pct=_hp, health_breakdown=_hb,
     )
 
 
