@@ -534,29 +534,21 @@ def generate_picks_dashboard():
     _empty_row = ('<tr><td colspan="13" style="text-align:center;'
                   'padding:40px;color:#9ca3af">No patterns detected today</td></tr>')
 
-    # ── Fetch CMP: one ticker at a time using existing fetch_price() ─────────
-    # Batch yfinance downloads have proven unreliable in this environment due to
-    # MultiIndex column structure varying by yfinance version. Using individual
-    # fetch_price() calls (which already work for the watchlist check) is safer.
-    # fetch_price() already handles retries, ANCHOR date, and .NS suffix.
-    print("  Fetching CMP for pattern symbols...")
-    _symbols = df["Symbol"].dropna().tolist()
+    # ── Derive CMP from data already in the CSV — no yfinance call needed ──────
+    # The scanner already fetched prices. Gap_To_Break_% = (Entry - CMP) / CMP * 100
+    # So: CMP = Breakout_Level / (1 + Gap_To_Break_% / 100)
+    # This works on weekends and never fails due to Yahoo Finance issues.
     _cmp_map = {}
-    for _sym in _symbols:
-        # Strip .NS before passing to fetch_price() — it adds .NS itself.
-        # Without this, CONCORDBIO.NS becomes CONCORDBIO.NS.NS and returns None.
-        _sym_clean = _sym.replace(".NS", "").replace(".BO", "")
-        _sym_key   = _sym_clean   # map key = bare symbol e.g. CONCORDBIO
+    for _, _r in df.iterrows():
+        _sym_key = str(_r.get("Symbol", "")).replace(".NS", "").replace(".BO", "")
         try:
-            _close, _vol, _date = fetch_price(_sym_clean)
-            if _close is not None:
-                _cmp_map[_sym_key] = _close
-                print(f"    CMP {_sym_key}: Rs{_close:.2f} ({_date})")
-            else:
-                print(f"    CMP {_sym_key}: fetch returned None")
-        except Exception as _e:
-            print(f"    CMP {_sym_key}: exception — {_e}")
-    print(f"  CMP fetched for {len(_cmp_map)}/{len(_symbols)} symbols")
+            _entry = float(_r.get("Breakout_Level") or 0)
+            _gap   = float(_r.get("Gap_To_Break_%") or 0)
+            if _entry > 0 and _gap >= 0:
+                _cmp_map[_sym_key] = round(_entry / (1 + _gap / 100), 2)
+        except Exception:
+            pass
+    print(f"  CMP derived for {len(_cmp_map)} symbols from scan data")
 
     rows = ""
     for _, r in df.iterrows():
